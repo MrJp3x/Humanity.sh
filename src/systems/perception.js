@@ -72,7 +72,11 @@ export const perceptionSystem = {
     // Remove only this phase's delivered events. Events emitted by later systems
     // remain queued for the next hour instead of being silently discarded.
     const events = world.pendingEvents.splice(0);
-    for (const event of events) {
+    const recorded = new Map(world.events.map(event => [event.id, event]));
+    for (const queued of events) {
+      // A JSON round trip duplicates object references. Update the canonical
+      // ledger record so its observer list stays accurate after restoration.
+      const event = recorded.get(queued.id) ?? queued;
       if (event.visibility === 'private') continue;
       const participants = world.agents.filter(a => a.id === event.targetId || a.id === event.actorId);
       const nearby = world.agents.filter(a => a.id !== event.actorId && a.id !== event.targetId && (event.visibility === 'public' || a.locationId === event.locationId));
