@@ -5,7 +5,7 @@ import json
 from PySide6.QtCore import QObject, Signal, Slot
 from PySide6.QtWidgets import QFileDialog
 
-FRONTEND_METHODS = {"state", "new_world", "step", "run", "speed", "inspect", "condition", "achievement", "snapshot", "import", "save", "load", "export", "open"}
+FRONTEND_METHODS = {"state", "new_world", "step", "run", "speed", "inspect", "condition", "achievement", "encounter", "snapshot", "import", "save", "load", "export", "open"}
 
 
 class EngineBridge(QObject):

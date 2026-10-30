@@ -16,12 +16,13 @@ def create_agent(world: World, index: int) -> Agent:
     place = LOCATIONS[index % len(LOCATIONS)]
     family_index = (index + index // len(FIRST_NAMES)) % len(LAST_NAMES)
     name = f"{FIRST_NAMES[index % len(FIRST_NAMES)]} {LAST_NAMES[family_index]}"
-    # Keep random draws in a documented order for version-1 compatibility.
+    # Keep identity/trait draws stable when importing the previous model.
     identity = Identity(name, int(between(world, 19, 63)), pick(world, ROLES), background["story"])
     beliefs = Beliefs(clamp(.5 + background["trust"] + between(world, -.08, .08)),
                       clamp(.5 + background["fairness"]), between(world, .35, .8))
     needs = Needs(between(world, .5, .95), between(world, .3, .8), between(world, .45, .85), between(world, .35, .8))
-    emotions = Emotions(between(world, .2, .55), between(world, .05, .3), between(world, .01, .15), .02, .08)
+    joy, fear, sadness = between(world, .2, .55), between(world, .05, .3), between(world, .01, .15)
+    emotions = Emotions(joy=joy, sadness=sadness, fear=fear, anger=.02, disgust=.0)
     position = Position(clamp(place["x"] + between(world, -.10, .10), .06, .94),
                         clamp(place["y"] + between(world, -.1, .1), .08, .92))
     return Agent(
@@ -54,9 +55,10 @@ def remember(world: World, agent: Agent, **details) -> Memory:
 
 def wellbeing(agent: Agent) -> float:
     n, e = agent.needs, agent.emotions
-    return clamp((n.energy + n.belonging + n.safety + n.esteem) / 4 + e.joy * .12 - e.anxiety * .12 - e.sadness * .1)
+    return clamp((n.energy + n.belonging + n.safety + n.esteem) / 4 + e.joy * .12 - e.fear * .12 - e.sadness * .1 - e.anger * .05)
 
 
 def mask_gap(agent: Agent) -> float:
     e = agent.emotions
-    return clamp(agent.public_state.warmth - (e.joy - e.envy * .65 - e.anger * .6))
+    inner_warmth = clamp(.5 + e.joy * .5 - (e.sadness + e.fear + e.anger + e.disgust) * .25)
+    return abs(agent.public_state.warmth - inner_warmth)

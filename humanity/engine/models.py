@@ -52,10 +52,10 @@ class Needs:
 @dataclass
 class Emotions:
     joy: float
-    anxiety: float
-    envy: float
-    anger: float
     sadness: float
+    fear: float
+    anger: float
+    disgust: float
 
 
 @dataclass
@@ -133,6 +133,10 @@ class Memory:
     masked: bool | None = optional()
     factors: list[Factor] | None = optional()
     evidence_ids: list[str] | None = optional()
+    appraisal: dict[str, float] | None = optional()
+    emotions_before: dict[str, float] | None = optional()
+    emotions_after: dict[str, float] | None = optional()
+    reaction_reason: str | None = optional()
 
 
 @dataclass
@@ -180,8 +184,10 @@ class Metrics:
     gap: float
     connections: int
     joy: float
-    anxiety: float
-    envy: float
+    sadness: float
+    fear: float
+    anger: float
+    disgust: float
 
 
 @dataclass
@@ -195,7 +201,7 @@ class Conditions:
 class World:
     seed: str
     rng: int
-    schema_version: int = 1
+    schema_version: int = 2
     tick: int = 0
     agents: list[Agent] = field(default_factory=list)
     events: list[Event] = field(default_factory=list)

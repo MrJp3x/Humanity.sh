@@ -8,7 +8,11 @@
     "confront": "اعتراض",
     "celebrate": "تبریک گفتن",
     "withdraw": "کناره‌گیری",
-    "practice": "تلاش بیشتر"
+    "practice": "تلاش بیشتر",
+    "appreciate": "پاسخ گرم",
+    "support": "جست‌وجوی حمایت",
+    "protest": "اعتراض به رفتار",
+    "polite": "پاسخ محتاطانه"
   },
   "actionLocations": {
     "rest": "home",
@@ -66,10 +70,10 @@
   },
   "emotionLabels": {
     "joy": "شادی",
-    "anxiety": "اضطراب",
-    "envy": "حسادت",
+    "sadness": "غم",
+    "fear": "ترس",
     "anger": "خشم",
-    "sadness": "اندوه"
+    "disgust": "انزجار"
   },
   "firstNames": [
     "نازنین",

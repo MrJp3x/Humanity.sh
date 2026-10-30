@@ -1,6 +1,6 @@
 {
   "name": "humanity-sh",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "private": true,
   "description": "An extensible society simulation of individual minds and shared lives.",
   "type": "module",

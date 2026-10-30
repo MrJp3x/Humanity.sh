@@ -27,7 +27,7 @@ python -m humanity.desktop
 
 On Windows, activate with `.venv\Scripts\activate` instead. On macOS, after setup you can double-click `Humanity.command`. The interface is in Persian. HTML, JavaScript, fonts, and the Python engine run locally; no ChatGPT sign-in, network service, or AI API key is needed after installation.
 
-Version 0.2 was verified with PySide6 6.12.0. `requirements-desktop.txt` pins that tested top-level version; the desktop extra permits supported Qt 6 releases.
+Version 0.3 uses the same desktop runtime verified with PySide6 6.12.0. `requirements-desktop.txt` pins that tested top-level version; the desktop extra permits supported Qt 6 releases.
 
 ```sh
 python -m humanity.desktop --fresh                    # Ignore the previous session
@@ -41,6 +41,7 @@ Start with these files:
 | File | Responsibility |
 | --- | --- |
 | `humanity/engine/models.py` | Dataclasses for people, personality, emotions, relationships, and worlds |
+| `humanity/engine/emotion.py` | Five emotion algorithms, decay, recovery, and parameters |
 | `humanity/engine/decision.py` | Explicit factors used to choose an action |
 | `humanity/engine/perception.py` | Personal interpretations, internal feelings, and outward expression |
 | `humanity/engine/actions.py` | Observable actions and their consequences |
@@ -65,11 +66,23 @@ simulation.set_condition("pressure", 0.6)
 simulation.announce_achievement("person-3")
 
 person = simulation.world.agents[0]
-print(person.identity.name, person.emotions.envy)
+print(person.identity.name, person.emotions.fear)
 restored = Simulation.from_snapshot(simulation.snapshot())
 ```
 
 The engine owns all state changes. HTML/CSS/JavaScript render the map and inspectors and send commands through Qt WebChannel. A single worker thread owns the Python world and clock. The frontend cannot run a second desktop simulation. See [the architecture and extension example](docs/architecture.md).
+
+## The five-feeling model
+
+**Conditions → personal appraisal → joy / sadness / fear / anger / disgust → coping → relationships and learning.**
+
+Each reaction exposes the observed event, personal interpretation, emotional state before and after, and coping reason. The structure is inspired by appraisal research; coefficients are project hypotheses. It is **not empirically validated** and does not yet predict real human behavior. [Equations, sources, assumptions and known limitations](docs/model.md).
+
+```sh
+python -m humanity.experiments --seeds 12 --population 24 --steps 48 --output report.json
+```
+
+This compares identical starting people under four conditions across independent seeds. The report measures this model, not a real society.
 
 ## Observatory features
 
@@ -79,7 +92,7 @@ The engine owns all state changes. HTML/CSS/JavaScript render the map and inspec
 - Directed trust: A's trust in B is independent of B's trust in A.
 - Rest, conversation, help, creative work, reflection, and conflict resolution.
 - Actual decision factors and individual memories linked to observed events.
-- A controlled experiment: announce an achievement and compare observers' joy, envy, interpretation, and outward response.
+- A controlled experiment: announce an achievement and compare five feelings, personal interpretation, before/after state, and outward response. Controlled help, rejection, insult and betrayal encounters use the same appraisal path.
 - Pause, hourly steps, speed settings, and environmental interventions.
 - Native JSON import/export plus separate manual saves and automatic session recovery.
 
@@ -89,7 +102,7 @@ Desktop time continues while the window is in the background. Closing the applic
 
 ### Existing web saves
 
-The version-1 JSON world format and random generator were preserved. Export a world from the browser and open it in the desktop app. Python exports can also continue in the original browser engine. Cross-language tests verify the same worlds and continuation paths, including Unicode seeds. Browser-local storage is not automatically accessible from the desktop app; export/import is the transfer mechanism.
+Version 0.3 writes **version-2 snapshots**. Version-1 web/desktop files are migrated explicitly: anxiety becomes fear, comparison-related distress contributes to sadness, and disgust starts at zero. Existing memories and identities are preserved; incompatible metric history is cleared. The original automatic session is backed up before replacement. Migration changes future behavior. New saves cannot continue in the old browser engine. See [the complete mapping and limitations](docs/model.md). Browser local storage must still be exported manually.
 
 ## Tests and packaging
 
@@ -107,7 +120,7 @@ The wheel includes the HTML interface and its assets. This is a Python desktop a
 
 ## Original standalone web demo
 
-The existing browser implementation remains as a compatibility adapter and migration reference. It runs its own JavaScript engine without Python. It is separate from the desktop backend and should not be mistaken for a remote Python session.
+The old version-1 browser model remains as a legacy demo and migration reference. It does not include the desktop five-feeling model. It runs its own JavaScript engine without Python. It is separate from the desktop backend and should not be mistaken for a remote Python session.
 
 ```sh
 npm run dev      # http://127.0.0.1:4173

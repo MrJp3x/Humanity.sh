@@ -1,4 +1,4 @@
-# Architecture, version 0.2
+# Architecture, version 0.3
 
 ## Runtime boundaries
 
@@ -27,9 +27,11 @@ Frontend code sends commands and receives JSON projections. It does not own a de
 
 ## Events and individual interpretation
 
-Events record external facts. Individual appraisals become memories linked by event ID. Private events are excluded from witnesses; local events reach participants and at most four nearby observers. The controlled public achievement announcement reaches up to twelve sampled bystanders plus participants.
+Events record external facts. Individual appraisals become memories linked by event ID. Private self-experiences are appraised only by their owner; local events reach participants and at most four nearby observers. The controlled public achievement announcement reaches up to twelve sampled bystanders plus participants.
 
 Directed relationships belong to the observer. Internal emotions and public presentation are separate. The last independent utility decision can differ from a subsequent outward social reaction.
+
+`emotion.py` owns the five response equations and time decay. `perception.py` owns appraisal, coping and learning. Material action outcomes emit events rather than changing emotion directly. Appraisal memories include dimensions, before/after emotion state and reaction reasons. Direct replies are deferred events with a cause ID; response events cannot emit further replies.
 
 ## Adding a Python system
 
@@ -67,20 +69,20 @@ A read-only loopback server on a random local port serves only interface assets.
 
 View projections include Python-computed metrics and complete memories for the selected person. Other people's memory lists are trimmed to recent context and the current experiment to reduce transport cost. Total memory counts remain accurate. Selecting another person requests a fresh projection. Projections never replace engine state and are explicitly rejected as snapshots.
 
-Complete saves use version-1 world JSON and the original random stream. They are written to a temporary sibling file, flushed, and atomically replaced. A manual checkpoint (`world.json`) is independent of the automatic closing session (`session.json`). Resume starts paused. An unreadable session is renamed to a recoverable backup before a replacement is written. User-selected JSON files provide web/desktop transfer; browser localStorage is not shared with Qt.
+Complete saves use version-2 world JSON and the seeded random stream. Version-1 data has an explicit, one-way migration; the original automatic session is backed up and old metric history is cleared. New saves are rejected by the legacy browser model. They are written to a temporary sibling file, flushed, and atomically replaced. A manual checkpoint (`world.json`) is independent of the automatic closing session (`session.json`). Resume starts paused. An unreadable session is renamed to a recoverable backup before a replacement is written. User-selected legacy JSON files provide migration into the desktop; browser localStorage is not shared with Qt.
 
 ## Compatibility and scaling
 
-Both engines use the same catalog and 32-bit Mulberry32 generator, including the original UTF-16 seed-hashing behavior. Cross-language tests compare complete worlds after deterministic runs and test continuation in both directions. Optional null fields may be omitted in Python's compact JSON; their meaning is unchanged. Incompatible future schemas need explicit migrations, not silent reinterpretation.
+Both engines use the same catalog and 32-bit Mulberry32 generator, including the original UTF-16 seed-hashing behavior. Migration tests verify preservation of identity, traits and memories, and deterministic continuation under the new Python rules. The engines intentionally differ in model semantics; exact behavioral equivalence is no longer expected. Optional null fields may be omitted in Python's compact JSON; their meaning is unchanged. Incompatible future schemas need explicit migrations, not silent reinterpretation.
 
 The API ceiling remains 300 people and the interface offers up to 240. Some selection and relationship scans are quadratic; this is a bounded prototype rather than an unlimited-population engine. Histories and memories are bounded. Profile before adding indexes, multiprocessing, or a database.
 
 ## Validation
 
 - Python engine, persistence, projection, and extension tests use `unittest`.
-- Migration tests invoke the original Node engine as an independent behavioral reference.
+- Migration tests invoke the original Node engine as an independent version-1 data source.
 - Qt signal integration tests exercise the actual bridge, worker-owned timer, native chooser routing, and file saves without desktop automation.
 - Asset-server tests check MIME types and that code/Git files are inaccessible.
 - Existing Node behavioral tests and the static build keep the standalone browser compatible.
 
-The Python engine has no AI-provider dependency. Personality labels and model weights remain exploratory assumptions; the migration does not claim a more realistic psychology simply because the engine language changed.
+The Python engine has no AI-provider dependency. Personality labels and model weights remain exploratory assumptions; the five-emotion algorithms are theory-inspired hypotheses, not empirically validated psychology. See `model.md` for equations and paired experiments.

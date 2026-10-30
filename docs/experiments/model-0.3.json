@@ -1,0 +1,1221 @@
+{
+  "model_version": "0.3.0",
+  "population": 24,
+  "hours": 48,
+  "replicate_seeds": 12,
+  "conditions": {
+    "secure": {
+      "abundance": 0.9,
+      "social_safety": 0.9,
+      "pressure": 0.15
+    },
+    "unsafe": {
+      "abundance": 0.9,
+      "social_safety": 0.1,
+      "pressure": 0.15
+    },
+    "scarce": {
+      "abundance": 0.1,
+      "social_safety": 0.9,
+      "pressure": 0.15
+    },
+    "pressured": {
+      "abundance": 0.9,
+      "social_safety": 0.9,
+      "pressure": 0.9
+    }
+  },
+  "interpretation": "Model counterfactuals only; no empirical human validation. Standard errors describe seed variability, not uncertainty about the theory or coefficients.",
+  "summary": {
+    "secure": {
+      "wellbeing": 0.9818975452206241,
+      "trust": 0.5202169388247486,
+      "joy": 0.7100583525564801,
+      "sadness": 0.04529029942758502,
+      "fear": 0.016592809610337895,
+      "anger": 2.0533857939390767e-08,
+      "disgust": 0.0
+    },
+    "unsafe": {
+      "wellbeing": 0.9334227947802543,
+      "trust": 0.5200007709210912,
+      "joy": 0.6897573860655647,
+      "sadness": 0.049179711668514564,
+      "fear": 0.09568011956758216,
+      "anger": 2.9352978703333326e-08,
+      "disgust": 0.0
+    },
+    "scarce": {
+      "wellbeing": 0.9458021075998905,
+      "trust": 0.5168001689098831,
+      "joy": 0.6432645581532249,
+      "sadness": 0.11971162119994853,
+      "fear": 0.019961525561981792,
+      "anger": 7.556475480242693e-08,
+      "disgust": 0.0
+    },
+    "pressured": {
+      "wellbeing": 0.975316776606211,
+      "trust": 0.5250363059597944,
+      "joy": 0.631451835163927,
+      "sadness": 0.08266679885071136,
+      "fear": 0.051341720175339244,
+      "anger": 5.384755277352658e-08,
+      "disgust": 0.0
+    }
+  },
+  "paired_difference_from_secure": {
+    "unsafe": {
+      "wellbeing": {
+        "mean_difference": -0.04847475044036989,
+        "standard_error_across_seeds": 0.0038126310157893897
+      },
+      "trust": {
+        "mean_difference": -0.00021616790365731423,
+        "standard_error_across_seeds": 0.00029641049451785444
+      },
+      "joy": {
+        "mean_difference": -0.02030096649091533,
+        "standard_error_across_seeds": 0.010277071757699196
+      },
+      "sadness": {
+        "mean_difference": 0.0038894122409295364,
+        "standard_error_across_seeds": 0.003704455607318671
+      },
+      "fear": {
+        "mean_difference": 0.07908730995724426,
+        "standard_error_across_seeds": 0.0024991774083474804
+      },
+      "anger": {
+        "mean_difference": 8.819120763942558e-09,
+        "standard_error_across_seeds": 1.5815120687790613e-09
+      },
+      "disgust": {
+        "mean_difference": 0.0,
+        "standard_error_across_seeds": 0.0
+      }
+    },
+    "scarce": {
+      "wellbeing": {
+        "mean_difference": -0.03609543762073364,
+        "standard_error_across_seeds": 0.004550964957447361
+      },
+      "trust": {
+        "mean_difference": -0.003416769914865401,
+        "standard_error_across_seeds": 0.00026446435836787586
+      },
+      "joy": {
+        "mean_difference": -0.0667937944032551,
+        "standard_error_across_seeds": 0.009965269328287615
+      },
+      "sadness": {
+        "mean_difference": 0.0744213217723635,
+        "standard_error_across_seeds": 0.0042156149291619
+      },
+      "fear": {
+        "mean_difference": 0.003368715951643896,
+        "standard_error_across_seeds": 0.0007846420658421915
+      },
+      "anger": {
+        "mean_difference": 5.5030896863036164e-08,
+        "standard_error_across_seeds": 3.5691754036893067e-09
+      },
+      "disgust": {
+        "mean_difference": 0.0,
+        "standard_error_across_seeds": 0.0
+      }
+    },
+    "pressured": {
+      "wellbeing": {
+        "mean_difference": -0.006580768614413202,
+        "standard_error_across_seeds": 0.0017434220939495947
+      },
+      "trust": {
+        "mean_difference": 0.004819367135045938,
+        "standard_error_across_seeds": 0.0004469913922500702
+      },
+      "joy": {
+        "mean_difference": -0.07860651739255299,
+        "standard_error_across_seeds": 0.008054963098904671
+      },
+      "sadness": {
+        "mean_difference": 0.03737649942312634,
+        "standard_error_across_seeds": 0.0026105122352859584
+      },
+      "fear": {
+        "mean_difference": 0.034748910565001345,
+        "standard_error_across_seeds": 0.000709075845407608
+      },
+      "anger": {
+        "mean_difference": 3.331369483413581e-08,
+        "standard_error_across_seeds": 2.468722097826863e-09
+      },
+      "disgust": {
+        "mean_difference": 0.0,
+        "standard_error_across_seeds": 0.0
+      }
+    }
+  },
+  "runs": [
+    {
+      "seed": "paired-0",
+      "case": "secure",
+      "metrics": {
+        "tick": 48,
+        "wellbeing": 0.9783318088583265,
+        "trust": 0.5169378569015384,
+        "gap": 0.061928557846248435,
+        "connections": 408,
+        "joy": 0.7365594056107615,
+        "sadness": 0.045060023071514195,
+        "fear": 0.0178160068564047,
+        "anger": 2.8193400091995115e-08,
+        "disgust": 0.0
+      },
+      "activities": {
+        "rest": 545,
+        "help": 168,
+        "connect": 156,
+        "create": 283
+      }
+    },
+    {
+      "seed": "paired-0",
+      "case": "unsafe",
+      "metrics": {
+        "tick": 48,
+        "wellbeing": 0.9171715342446111,
+        "trust": 0.5162328968944755,
+        "gap": 0.13607064010530726,
+        "connections": 397,
+        "joy": 0.6344723144887319,
+        "sadness": 0.06010825839039132,
+        "fear": 0.11739864360172213,
+        "anger": 4.6231375686371234e-08,
+        "disgust": 0.0
+      },
+      "activities": {
+        "rest": 574,
+        "help": 173,
+        "connect": 138,
+        "create": 267
+      }
+    },
+    {
+      "seed": "paired-0",
+      "case": "scarce",
+      "metrics": {
+        "tick": 48,
+        "wellbeing": 0.9334145285981733,
+        "trust": 0.5124183614881712,
+        "gap": 0.0846672516114897,
+        "connections": 320,
+        "joy": 0.6469835448981612,
+        "sadness": 0.1297966874638453,
+        "fear": 0.022955278733653214,
+        "anger": 8.650439313820973e-08,
+        "disgust": 0.0
+      },
+      "activities": {
+        "rest": 667,
+        "help": 120,
+        "connect": 129,
+        "create": 236
+      }
+    },
+    {
+      "seed": "paired-0",
+      "case": "pressured",
+      "metrics": {
+        "tick": 48,
+        "wellbeing": 0.972054358879875,
+        "trust": 0.5197522476027856,
+        "gap": 0.09962707252405421,
+        "connections": 416,
+        "joy": 0.644007871692977,
+        "sadness": 0.08932501001859934,
+        "fear": 0.05562185798045441,
+        "anger": 7.921271274349007e-08,
+        "disgust": 0.0
+      },
+      "activities": {
+        "rest": 618,
+        "help": 214,
+        "connect": 195,
+        "create": 124,
+        "reflect": 1
+      }
+    },
+    {
+      "seed": "paired-1",
+      "case": "secure",
+      "metrics": {
+        "tick": 48,
+        "wellbeing": 0.9890240293601112,
+        "trust": 0.5223881315721505,
+        "gap": 0.051662153642977306,
+        "connections": 405,
+        "joy": 0.7227581907203301,
+        "sadness": 0.04770458018791159,
+        "fear": 0.017488335583239787,
+        "anger": 2.1277554974517058e-08,
+        "disgust": 0.0
+      },
+      "activities": {
+        "connect": 140,
+        "create": 289,
+        "rest": 539,
+        "help": 184
+      }
+    },
+    {
+      "seed": "paired-1",
+      "case": "unsafe",
+      "metrics": {
+        "tick": 48,
+        "wellbeing": 0.9264942887074069,
+        "trust": 0.5219369337504955,
+        "gap": 0.0825921649407333,
+        "connections": 398,
+        "joy": 0.7186819166912811,
+        "sadness": 0.037835379641193996,
+        "fear": 0.0981302123458777,
+        "anger": 3.0146416258055414e-08,
+        "disgust": 0.0
+      },
+      "activities": {
+        "connect": 141,
+        "create": 285,
+        "rest": 559,
+        "help": 167
+      }
+    },
+    {
+      "seed": "paired-1",
+      "case": "scarce",
+      "metrics": {
+        "tick": 48,
+        "wellbeing": 0.9448337855410475,
+        "trust": 0.5183344409953131,
+        "gap": 0.15769811961007288,
+        "connections": 330,
+        "joy": 0.6229399352350863,
+        "sadness": 0.13559117982906468,
+        "fear": 0.020938270829101335,
+        "anger": 8.25694900109647e-08,
+        "disgust": 0.0
+      },
+      "activities": {
+        "connect": 135,
+        "create": 242,
+        "rest": 650,
+        "help": 125
+      }
+    },
+    {
+      "seed": "paired-1",
+      "case": "pressured",
+      "metrics": {
+        "tick": 48,
+        "wellbeing": 0.972543841262205,
+        "trust": 0.5279056676891393,
+        "gap": 0.07167592816328221,
+        "connections": 436,
+        "joy": 0.6069529596851531,
+        "sadness": 0.09062546109168919,
+        "fear": 0.05483873616364021,
+        "anger": 5.299688671020908e-08,
+        "disgust": 0.0
+      },
+      "activities": {
+        "connect": 157,
+        "rest": 605,
+        "create": 129,
+        "help": 261
+      }
+    },
+    {
+      "seed": "paired-2",
+      "case": "secure",
+      "metrics": {
+        "tick": 48,
+        "wellbeing": 0.9875592880634536,
+        "trust": 0.5249366376084661,
+        "gap": 0.06256441070616754,
+        "connections": 418,
+        "joy": 0.6728672603892826,
+        "sadness": 0.045644828622738616,
+        "fear": 0.01656784430013378,
+        "anger": 2.3571375770975493e-08,
+        "disgust": 0.0
+      },
+      "activities": {
+        "connect": 192,
+        "create": 241,
+        "rest": 534,
+        "help": 185
+      }
+    },
+    {
+      "seed": "paired-2",
+      "case": "unsafe",
+      "metrics": {
+        "tick": 48,
+        "wellbeing": 0.9292769503519481,
+        "trust": 0.5243268896122305,
+        "gap": 0.09050102076814769,
+        "connections": 395,
+        "joy": 0.653016955140415,
+        "sadness": 0.04918080379110192,
+        "fear": 0.09205869755264144,
+        "anger": 3.39973120514902e-08,
+        "disgust": 0.0
+      },
+      "activities": {
+        "connect": 175,
+        "create": 242,
+        "rest": 551,
+        "help": 184
+      }
+    },
+    {
+      "seed": "paired-2",
+      "case": "scarce",
+      "metrics": {
+        "tick": 48,
+        "wellbeing": 0.9365135668437495,
+        "trust": 0.522779659910958,
+        "gap": 0.09765893837187377,
+        "connections": 355,
+        "joy": 0.5950034645789025,
+        "sadness": 0.10941507001398942,
+        "fear": 0.019226472334403086,
+        "anger": 8.422799807842399e-08,
+        "disgust": 0.0
+      },
+      "activities": {
+        "connect": 168,
+        "create": 180,
+        "rest": 651,
+        "help": 153
+      }
+    },
+    {
+      "seed": "paired-2",
+      "case": "pressured",
+      "metrics": {
+        "tick": 48,
+        "wellbeing": 0.969333081234327,
+        "trust": 0.5291607699562052,
+        "gap": 0.08045688927604965,
+        "connections": 412,
+        "joy": 0.5999865862076542,
+        "sadness": 0.07691582535413387,
+        "fear": 0.04733483703253761,
+        "anger": 5.6574156313994397e-08,
+        "disgust": 0.0
+      },
+      "activities": {
+        "connect": 233,
+        "create": 116,
+        "help": 212,
+        "rest": 591
+      }
+    },
+    {
+      "seed": "paired-3",
+      "case": "secure",
+      "metrics": {
+        "tick": 48,
+        "wellbeing": 0.9816459181209968,
+        "trust": 0.5248337581835403,
+        "gap": 0.04993471824540339,
+        "connections": 388,
+        "joy": 0.6790924180960691,
+        "sadness": 0.04695077324245178,
+        "fear": 0.01582930837014444,
+        "anger": 2.2323216958116984e-08,
+        "disgust": 0.0
+      },
+      "activities": {
+        "rest": 563,
+        "connect": 107,
+        "create": 262,
+        "help": 220
+      }
+    },
+    {
+      "seed": "paired-3",
+      "case": "unsafe",
+      "metrics": {
+        "tick": 48,
+        "wellbeing": 0.9488161359708421,
+        "trust": 0.527071266264213,
+        "gap": 0.09842125243560453,
+        "connections": 397,
+        "joy": 0.6938886210738994,
+        "sadness": 0.031181984494369652,
+        "fear": 0.08750521442111715,
+        "anger": 3.525317706963659e-08,
+        "disgust": 0.0
+      },
+      "activities": {
+        "rest": 560,
+        "connect": 116,
+        "create": 237,
+        "help": 239
+      }
+    },
+    {
+      "seed": "paired-3",
+      "case": "scarce",
+      "metrics": {
+        "tick": 48,
+        "wellbeing": 0.9556901710657182,
+        "trust": 0.5223490887332518,
+        "gap": 0.10606054637981337,
+        "connections": 337,
+        "joy": 0.6351026072759426,
+        "sadness": 0.10913585732479093,
+        "fear": 0.017324386664933373,
+        "anger": 7.644948780249789e-08,
+        "disgust": 0.0
+      },
+      "activities": {
+        "rest": 666,
+        "connect": 110,
+        "create": 205,
+        "help": 171
+      }
+    },
+    {
+      "seed": "paired-3",
+      "case": "pressured",
+      "metrics": {
+        "tick": 48,
+        "wellbeing": 0.9783346945548805,
+        "trust": 0.5301656728527924,
+        "gap": 0.07413093562411753,
+        "connections": 410,
+        "joy": 0.5943481987734638,
+        "sadness": 0.07650536674575344,
+        "fear": 0.051428299966159684,
+        "anger": 5.792416332083834e-08,
+        "disgust": 0.0
+      },
+      "activities": {
+        "rest": 606,
+        "connect": 141,
+        "create": 115,
+        "help": 289,
+        "reflect": 1
+      }
+    },
+    {
+      "seed": "paired-4",
+      "case": "secure",
+      "metrics": {
+        "tick": 48,
+        "wellbeing": 0.9749628584290794,
+        "trust": 0.5270203242968832,
+        "gap": 0.0884050819338222,
+        "connections": 411,
+        "joy": 0.6826745189862713,
+        "sadness": 0.05150001381868116,
+        "fear": 0.019317533076293043,
+        "anger": 1.9134239471603336e-08,
+        "disgust": 0.0
+      },
+      "activities": {
+        "connect": 116,
+        "create": 222,
+        "rest": 533,
+        "help": 281
+      }
+    },
+    {
+      "seed": "paired-4",
+      "case": "unsafe",
+      "metrics": {
+        "tick": 48,
+        "wellbeing": 0.9499076136688326,
+        "trust": 0.5271220165358755,
+        "gap": 0.08790504435006467,
+        "connections": 398,
+        "joy": 0.7123733894977194,
+        "sadness": 0.040654515875427094,
+        "fear": 0.08753571498224971,
+        "anger": 2.3825044295357468e-08,
+        "disgust": 0.0
+      },
+      "activities": {
+        "connect": 104,
+        "create": 211,
+        "rest": 555,
+        "help": 282
+      }
+    },
+    {
+      "seed": "paired-4",
+      "case": "scarce",
+      "metrics": {
+        "tick": 48,
+        "wellbeing": 0.9629362271277117,
+        "trust": 0.5226799001807458,
+        "gap": 0.07343022943757654,
+        "connections": 339,
+        "joy": 0.6967227553631369,
+        "sadness": 0.09721453026721384,
+        "fear": 0.016037520990710024,
+        "anger": 5.4937647870190995e-08,
+        "disgust": 0.0
+      },
+      "activities": {
+        "connect": 94,
+        "create": 171,
+        "rest": 669,
+        "help": 218
+      }
+    },
+    {
+      "seed": "paired-4",
+      "case": "pressured",
+      "metrics": {
+        "tick": 48,
+        "wellbeing": 0.978490065634109,
+        "trust": 0.5293337033058255,
+        "gap": 0.046545096115304586,
+        "connections": 419,
+        "joy": 0.6820738431679505,
+        "sadness": 0.07724898446379243,
+        "fear": 0.05075910837138493,
+        "anger": 4.0961372157728796e-08,
+        "disgust": 0.0
+      },
+      "activities": {
+        "connect": 154,
+        "help": 306,
+        "rest": 588,
+        "create": 104
+      }
+    },
+    {
+      "seed": "paired-5",
+      "case": "secure",
+      "metrics": {
+        "tick": 48,
+        "wellbeing": 0.9806802612159008,
+        "trust": 0.5155284845786422,
+        "gap": 0.05296814091485164,
+        "connections": 398,
+        "joy": 0.7076021527931305,
+        "sadness": 0.03606477739565809,
+        "fear": 0.012581652828261054,
+        "anger": 2.0883747028401053e-08,
+        "disgust": 0.0
+      },
+      "activities": {
+        "connect": 109,
+        "create": 338,
+        "rest": 533,
+        "help": 172
+      }
+    },
+    {
+      "seed": "paired-5",
+      "case": "unsafe",
+      "metrics": {
+        "tick": 48,
+        "wellbeing": 0.935399402295564,
+        "trust": 0.5150355602510324,
+        "gap": 0.08222347448910615,
+        "connections": 388,
+        "joy": 0.6671172130342465,
+        "sadness": 0.050069232693966924,
+        "fear": 0.08919437118433737,
+        "anger": 3.0710629811842e-08,
+        "disgust": 0.0
+      },
+      "activities": {
+        "connect": 106,
+        "create": 315,
+        "rest": 545,
+        "help": 186
+      }
+    },
+    {
+      "seed": "paired-5",
+      "case": "scarce",
+      "metrics": {
+        "tick": 48,
+        "wellbeing": 0.9369929289993122,
+        "trust": 0.5118544387270118,
+        "gap": 0.08843847051208999,
+        "connections": 305,
+        "joy": 0.6140265021253142,
+        "sadness": 0.11815485875455284,
+        "fear": 0.018480636530478198,
+        "anger": 9.65492228034545e-08,
+        "disgust": 0.0
+      },
+      "activities": {
+        "connect": 101,
+        "create": 257,
+        "help": 137,
+        "rest": 657
+      }
+    },
+    {
+      "seed": "paired-5",
+      "case": "pressured",
+      "metrics": {
+        "tick": 48,
+        "wellbeing": 0.9716805978144105,
+        "trust": 0.5203460625053423,
+        "gap": 0.07151085448796644,
+        "connections": 397,
+        "joy": 0.6092295168072782,
+        "sadness": 0.08383245434178073,
+        "fear": 0.04871285750567587,
+        "anger": 5.744562837921297e-08,
+        "disgust": 0.0
+      },
+      "activities": {
+        "connect": 139,
+        "create": 166,
+        "rest": 599,
+        "help": 248
+      }
+    },
+    {
+      "seed": "paired-6",
+      "case": "secure",
+      "metrics": {
+        "tick": 48,
+        "wellbeing": 0.9783610450571589,
+        "trust": 0.5093145505016625,
+        "gap": 0.06258417218960831,
+        "connections": 404,
+        "joy": 0.741854713730436,
+        "sadness": 0.04154037136711677,
+        "fear": 0.016238283060742282,
+        "anger": 1.8148955092081287e-08,
+        "disgust": 0.0
+      },
+      "activities": {
+        "create": 351,
+        "rest": 524,
+        "connect": 155,
+        "help": 122
+      }
+    },
+    {
+      "seed": "paired-6",
+      "case": "unsafe",
+      "metrics": {
+        "tick": 48,
+        "wellbeing": 0.9151235461071267,
+        "trust": 0.5106308653046467,
+        "gap": 0.13458106045532914,
+        "connections": 380,
+        "joy": 0.6956348463375801,
+        "sadness": 0.05589962088314291,
+        "fear": 0.10579630722028253,
+        "anger": 3.6054791997204984e-08,
+        "disgust": 0.0
+      },
+      "activities": {
+        "create": 321,
+        "rest": 548,
+        "connect": 141,
+        "help": 142
+      }
+    },
+    {
+      "seed": "paired-6",
+      "case": "scarce",
+      "metrics": {
+        "tick": 48,
+        "wellbeing": 0.9346769088241041,
+        "trust": 0.5067659616620984,
+        "gap": 0.05497124398603518,
+        "connections": 350,
+        "joy": 0.6641622024255238,
+        "sadness": 0.13766088495349293,
+        "fear": 0.022728447266362542,
+        "anger": 7.121512058000554e-08,
+        "disgust": 0.0
+      },
+      "activities": {
+        "create": 267,
+        "rest": 644,
+        "connect": 140,
+        "help": 101
+      }
+    },
+    {
+      "seed": "paired-6",
+      "case": "pressured",
+      "metrics": {
+        "tick": 48,
+        "wellbeing": 0.9747565904766303,
+        "trust": 0.5176604046839609,
+        "gap": 0.07606440370174086,
+        "connections": 427,
+        "joy": 0.6542930300293912,
+        "sadness": 0.08969570523418653,
+        "fear": 0.05257526229952344,
+        "anger": 6.192222940036377e-08,
+        "disgust": 0.0
+      },
+      "activities": {
+        "connect": 200,
+        "create": 164,
+        "rest": 588,
+        "help": 200
+      }
+    },
+    {
+      "seed": "paired-7",
+      "case": "secure",
+      "metrics": {
+        "tick": 48,
+        "wellbeing": 0.9852964864836083,
+        "trust": 0.5214180913614245,
+        "gap": 0.06003878563873031,
+        "connections": 421,
+        "joy": 0.6919146408121467,
+        "sadness": 0.058902894073067986,
+        "fear": 0.021238389353285342,
+        "anger": 2.2751146322543846e-08,
+        "disgust": 0.0
+      },
+      "activities": {
+        "connect": 140,
+        "create": 250,
+        "rest": 554,
+        "help": 208
+      }
+    },
+    {
+      "seed": "paired-7",
+      "case": "unsafe",
+      "metrics": {
+        "tick": 48,
+        "wellbeing": 0.9435614682681471,
+        "trust": 0.5205320340934985,
+        "gap": 0.13989037055758013,
+        "connections": 409,
+        "joy": 0.7036912158228201,
+        "sadness": 0.05112410310191338,
+        "fear": 0.09824328522956209,
+        "anger": 2.7477124452518804e-08,
+        "disgust": 0.0
+      },
+      "activities": {
+        "connect": 152,
+        "create": 228,
+        "rest": 558,
+        "help": 214
+      }
+    },
+    {
+      "seed": "paired-7",
+      "case": "scarce",
+      "metrics": {
+        "tick": 48,
+        "wellbeing": 0.9513160194231499,
+        "trust": 0.5167829856160759,
+        "gap": 0.12922545955433365,
+        "connections": 380,
+        "joy": 0.6236094767349639,
+        "sadness": 0.13685683959666559,
+        "fear": 0.024946466573493708,
+        "anger": 8.048186153269269e-08,
+        "disgust": 0.0
+      },
+      "activities": {
+        "connect": 151,
+        "create": 199,
+        "rest": 657,
+        "help": 145
+      }
+    },
+    {
+      "seed": "paired-7",
+      "case": "pressured",
+      "metrics": {
+        "tick": 48,
+        "wellbeing": 0.981169734963621,
+        "trust": 0.5254395266287808,
+        "gap": 0.07751101004892728,
+        "connections": 447,
+        "joy": 0.6109814090698443,
+        "sadness": 0.08659839922924428,
+        "fear": 0.05496102545368711,
+        "anger": 5.1210433065098217e-08,
+        "disgust": 0.0
+      },
+      "activities": {
+        "connect": 195,
+        "create": 99,
+        "rest": 607,
+        "help": 251
+      }
+    },
+    {
+      "seed": "paired-8",
+      "case": "secure",
+      "metrics": {
+        "tick": 48,
+        "wellbeing": 0.9799952444831598,
+        "trust": 0.5215501478610302,
+        "gap": 0.05402154342923521,
+        "connections": 400,
+        "joy": 0.6834933485566458,
+        "sadness": 0.03916745593515188,
+        "fear": 0.0141420957688715,
+        "anger": 2.258764529916725e-08,
+        "disgust": 0.0
+      },
+      "activities": {
+        "create": 293,
+        "connect": 134,
+        "rest": 535,
+        "help": 190
+      }
+    },
+    {
+      "seed": "paired-8",
+      "case": "unsafe",
+      "metrics": {
+        "tick": 48,
+        "wellbeing": 0.9313312245360968,
+        "trust": 0.5206646856061559,
+        "gap": 0.08500667687480175,
+        "connections": 395,
+        "joy": 0.6545328947175321,
+        "sadness": 0.0585760500909057,
+        "fear": 0.09391876537144239,
+        "anger": 2.4978997761417736e-08,
+        "disgust": 0.0
+      },
+      "activities": {
+        "create": 290,
+        "connect": 135,
+        "rest": 538,
+        "help": 189
+      }
+    },
+    {
+      "seed": "paired-8",
+      "case": "scarce",
+      "metrics": {
+        "tick": 48,
+        "wellbeing": 0.9591267365549769,
+        "trust": 0.5179351714473249,
+        "gap": 0.06851048534986785,
+        "connections": 331,
+        "joy": 0.6477279599880646,
+        "sadness": 0.10545773887243022,
+        "fear": 0.018252514760802366,
+        "anger": 7.647045714886985e-08,
+        "disgust": 0.0
+      },
+      "activities": {
+        "create": 222,
+        "connect": 122,
+        "rest": 656,
+        "help": 152
+      }
+    },
+    {
+      "seed": "paired-8",
+      "case": "pressured",
+      "metrics": {
+        "tick": 48,
+        "wellbeing": 0.9761582005539001,
+        "trust": 0.5268309824876591,
+        "gap": 0.06935562812239662,
+        "connections": 416,
+        "joy": 0.599196340235565,
+        "sadness": 0.08712581507647865,
+        "fear": 0.05205173942591918,
+        "anger": 6.253043998804999e-08,
+        "disgust": 0.0
+      },
+      "activities": {
+        "create": 132,
+        "connect": 159,
+        "rest": 597,
+        "help": 263,
+        "reflect": 1
+      }
+    },
+    {
+      "seed": "paired-9",
+      "case": "secure",
+      "metrics": {
+        "tick": 48,
+        "wellbeing": 0.9759159975430552,
+        "trust": 0.5147261565414251,
+        "gap": 0.07867717025299653,
+        "connections": 374,
+        "joy": 0.7508006804762366,
+        "sadness": 0.0390391815809989,
+        "fear": 0.01479043435254073,
+        "anger": 1.4618338106658371e-08,
+        "disgust": 0.0
+      },
+      "activities": {
+        "create": 389,
+        "connect": 111,
+        "rest": 504,
+        "help": 148
+      }
+    },
+    {
+      "seed": "paired-9",
+      "case": "unsafe",
+      "metrics": {
+        "tick": 48,
+        "wellbeing": 0.912802733218112,
+        "trust": 0.5143453511264741,
+        "gap": 0.1277345621791994,
+        "connections": 366,
+        "joy": 0.7184499674446824,
+        "sadness": 0.057795918558258906,
+        "fear": 0.09805441202132383,
+        "anger": 2.4314663277768862e-08,
+        "disgust": 0.0
+      },
+      "activities": {
+        "create": 356,
+        "connect": 112,
+        "rest": 532,
+        "help": 152
+      }
+    },
+    {
+      "seed": "paired-9",
+      "case": "scarce",
+      "metrics": {
+        "tick": 48,
+        "wellbeing": 0.9106272402227611,
+        "trust": 0.5113144029482676,
+        "gap": 0.10523259579312409,
+        "connections": 307,
+        "joy": 0.6357740445053256,
+        "sadness": 0.1297679065323477,
+        "fear": 0.018317536187117397,
+        "anger": 8.634536507629225e-08,
+        "disgust": 0.0
+      },
+      "activities": {
+        "create": 270,
+        "connect": 118,
+        "rest": 648,
+        "help": 116
+      }
+    },
+    {
+      "seed": "paired-9",
+      "case": "pressured",
+      "metrics": {
+        "tick": 48,
+        "wellbeing": 0.9714376877992067,
+        "trust": 0.5187843888950989,
+        "gap": 0.07431585134452019,
+        "connections": 368,
+        "joy": 0.6711447339133888,
+        "sadness": 0.08265269669653892,
+        "fear": 0.04845931398343134,
+        "anger": 4.14027332377221e-08,
+        "disgust": 0.0
+      },
+      "activities": {
+        "rest": 600,
+        "help": 202,
+        "connect": 122,
+        "create": 228
+      }
+    },
+    {
+      "seed": "paired-10",
+      "case": "secure",
+      "metrics": {
+        "tick": 48,
+        "wellbeing": 0.9863764962204145,
+        "trust": 0.5214599293723982,
+        "gap": 0.05667596490352703,
+        "connections": 406,
+        "joy": 0.7233766291835444,
+        "sadness": 0.05259747241817752,
+        "fear": 0.01877965938096657,
+        "anger": 1.6870081803450013e-08,
+        "disgust": 0.0
+      },
+      "activities": {
+        "connect": 146,
+        "rest": 534,
+        "create": 250,
+        "help": 222
+      }
+    },
+    {
+      "seed": "paired-10",
+      "case": "unsafe",
+      "metrics": {
+        "tick": 48,
+        "wellbeing": 0.9422237434174314,
+        "trust": 0.5199536276128123,
+        "gap": 0.127005049145817,
+        "connections": 398,
+        "joy": 0.730702030203112,
+        "sadness": 0.04910326043933519,
+        "fear": 0.09538938861156365,
+        "anger": 2.110145403653247e-08,
+        "disgust": 0.0
+      },
+      "activities": {
+        "connect": 118,
+        "rest": 552,
+        "create": 272,
+        "help": 210
+      }
+    },
+    {
+      "seed": "paired-10",
+      "case": "scarce",
+      "metrics": {
+        "tick": 48,
+        "wellbeing": 0.9720148385781443,
+        "trust": 0.519437117450649,
+        "gap": 0.07346652296062517,
+        "connections": 357,
+        "joy": 0.6669969480942818,
+        "sadness": 0.11830074856780064,
+        "fear": 0.01984854250476414,
+        "anger": 5.494163815455995e-08,
+        "disgust": 0.0
+      },
+      "activities": {
+        "connect": 128,
+        "rest": 658,
+        "create": 186,
+        "help": 180
+      }
+    },
+    {
+      "seed": "paired-10",
+      "case": "pressured",
+      "metrics": {
+        "tick": 48,
+        "wellbeing": 0.9764846543348377,
+        "trust": 0.5271280575923588,
+        "gap": 0.044917926231870985,
+        "connections": 417,
+        "joy": 0.6617712591569721,
+        "sadness": 0.08103241022432274,
+        "fear": 0.05255234478285547,
+        "anger": 4.2158054395679646e-08,
+        "disgust": 0.0
+      },
+      "activities": {
+        "connect": 151,
+        "rest": 599,
+        "create": 105,
+        "help": 297
+      }
+    },
+    {
+      "seed": "paired-11",
+      "case": "secure",
+      "metrics": {
+        "tick": 48,
+        "wellbeing": 0.9846211088122248,
+        "trust": 0.5224891971178218,
+        "gap": 0.06093124114440388,
+        "connections": 429,
+        "joy": 0.7277062713229059,
+        "sadness": 0.039311221417551806,
+        "fear": 0.014324172393171518,
+        "anger": 1.6046594353179398e-08,
+        "disgust": 0.0
+      },
+      "activities": {
+        "connect": 120,
+        "create": 260,
+        "rest": 536,
+        "help": 236
+      }
+    },
+    {
+      "seed": "paired-11",
+      "case": "unsafe",
+      "metrics": {
+        "tick": 48,
+        "wellbeing": 0.9489648965769323,
+        "trust": 0.5221571240011852,
+        "gap": 0.07076865259679165,
+        "connections": 393,
+        "joy": 0.6945272683347565,
+        "sadness": 0.048627412062167745,
+        "fear": 0.08493642226886595,
+        "anger": 1.8144757741804148e-08,
+        "disgust": 0.0
+      },
+      "activities": {
+        "connect": 125,
+        "create": 248,
+        "rest": 543,
+        "help": 236
+      }
+    },
+    {
+      "seed": "paired-11",
+      "case": "scarce",
+      "metrics": {
+        "tick": 48,
+        "wellbeing": 0.9514823394198374,
+        "trust": 0.5189504977587304,
+        "gap": 0.08019813559788247,
+        "connections": 363,
+        "joy": 0.6701252566139958,
+        "sadness": 0.1091871522231883,
+        "fear": 0.020482233367962118,
+        "anger": 5.6084375432961055e-08,
+        "disgust": 0.0
+      },
+      "activities": {
+        "connect": 119,
+        "create": 193,
+        "rest": 660,
+        "help": 180
+      }
+    },
+    {
+      "seed": "paired-11",
+      "case": "pressured",
+      "metrics": {
+        "tick": 48,
+        "wellbeing": 0.9813578117665284,
+        "trust": 0.5279281873175852,
+        "gap": 0.03885191331729564,
+        "connections": 420,
+        "joy": 0.6434362732274863,
+        "sadness": 0.07044345773201624,
+        "fear": 0.04680525913880169,
+        "anger": 4.183182356993151e-08,
+        "disgust": 0.0
+      },
+      "activities": {
+        "connect": 162,
+        "help": 296,
+        "rest": 589,
+        "create": 104,
+        "reflect": 1
+      }
+    }
+  ]
+}

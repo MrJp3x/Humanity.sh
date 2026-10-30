@@ -24,7 +24,9 @@ const map = new WorldMap($('#world-canvas'), {
   getWorld: () => world, getSelected: () => selectedId,
   onSelect: id => safe(() => selectAgent(id)), tooltip: $('#map-tooltip'),
 });
-$('.version').textContent = 'v0.2';
+$('.version').textContent = engine.mode === 'desktop' ? 'v0.3' : 'v0.1';
+$('#encounter-controls').hidden = engine.mode !== 'desktop';
+if (engine.mode !== 'desktop') $('.local-badge').textContent = 'دموی قدیمی · مدل پنج احساس در نسخهٔ دسکتاپ';
 if (engine.mode === 'desktop') {
   $('.local-badge').innerHTML = '<i></i> نسخهٔ دسکتاپ · روی این دستگاه';
   $('#save-button').innerHTML = `${icon('save',16)} ذخیره روی این دستگاه`;
@@ -78,6 +80,9 @@ function renderExperimentPeople() {
   const previous=$('#achievement-person').value;
   $('#achievement-person').innerHTML=world.agents.map(a=>`<option value="${a.id}">${esc(a.identity.name)}</option>`).join('');
   $('#achievement-person').value=world.agents.some(a=>a.id===previous)?previous:selectedId;
+  const previousTarget=$('#encounter-target').value;
+  $('#encounter-target').innerHTML=world.agents.map(a=>`<option value="${a.id}">${esc(a.identity.name)}</option>`).join('');
+  $('#encounter-target').value=world.agents.some(a=>a.id===previousTarget)?previousTarget:world.agents.find(a=>a.id!==$('#achievement-person').value).id;
 }
 function setTab(nextTab) {
   tab=nextTab;
@@ -119,7 +124,8 @@ document.addEventListener('click',event=>{
     if(button.dataset.speed)await command('speed',{value:Number(button.dataset.speed)});
     if(button.dataset.event){
       const record=world.events.find(e=>e.id===button.dataset.event);
-      if(record?.actorId){await command('inspect',{id:record.actorId});setTab('memories');render();}
+      const personId=record?.actorId ?? record?.targetId;
+      if(personId){await command('inspect',{id:personId});setTab('memories');render();}
     }
     if(button.hasAttribute('data-close-dialog'))button.closest('dialog').close();
   });
@@ -145,6 +151,11 @@ document.addEventListener('change',event=>{
   safe(async()=>{await command('condition',{key,value:Number(event.target.value)/100});$$(`[data-condition="${key}"]`).forEach(el=>el.value=event.target.value);toast('شرایط جهان تغییر کرد.');});
 });
 $('#announce-button').addEventListener('click',()=>safe(async()=>{await command('achievement',{id:$('#achievement-person').value});$('#experiment-results').scrollIntoView({behavior:'smooth',block:'start'});toast('خبر منتشر شد. برداشت شاهدان را مقایسه کن.');}));
+$('#encounter-button').addEventListener('click',()=>safe(async()=>{
+  await command('encounter',{kind:$('#encounter-kind').value,actorId:$('#achievement-person').value,targetId:$('#encounter-target').value});
+  $('#experiment-results').scrollIntoView({behavior:'smooth',block:'start'});
+  toast('برخورد رخ داد. یک فرد را برای دیدن علت و تغییر احساسش انتخاب کن.');
+}));
 $('#save-button').addEventListener('click',()=>safe(()=>command('save')));
 $('#load-button').addEventListener('click',()=>safe(()=>command('load')));
 $('#export-button').addEventListener('click',()=>safe(async()=>{

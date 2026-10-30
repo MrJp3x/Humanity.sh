@@ -7,10 +7,11 @@ export function dayTime(tick) { return `روز ${number(Math.floor((8 + tick) / 
 export const initials = name => name.split(' ').map(p => p[0]).slice(0, 2).join('');
 export function mood(agent) {
   const e = agent.emotions;
-  if (e.anxiety > .5 || e.anger > .4) return { label: 'تحت فشار', color: '#eaa36d', className: 'amber' };
-  if (e.envy > .35) return { label: 'درگیر مقایسه', color: '#b89af4', className: 'purple' };
+  if ((e.fear ?? e.anxiety) > .4) return { label: 'ترسیده', color: '#eaa36d', className: 'amber' };
+  if (e.anger > .35) return { label: 'خشمگین', color: '#eaa36d', className: 'amber' };
+  if (e.disgust > .3) return { label: 'بیزار از رفتار', color: '#b89af4', className: 'purple' };
   if (e.joy > .42) return { label: 'خوشحال', color: '#c9ed8c', className: 'green' };
   if (e.sadness > .3) return { label: 'دلگیر', color: '#7bace0', className: 'blue' };
   return { label: 'آرام', color: '#83bbbd', className: 'teal' };
 }
-export const kindLabels = { achievement: 'پیشرفت', connection: 'گفت‌وگو', help: 'همراهی', conflict: 'اختلاف', rejection: 'دعوت ردشده', reconciliation: 'آشتی', reflection: 'تأمل', rest: 'استراحت', setback: 'تلاش', intervention: 'دخالت ناظر' };
+export const kindLabels = { achievement: 'پیشرفت', connection: 'گفت‌وگو', help: 'همراهی', conflict: 'اختلاف', rejection: 'دعوت ردشده', reconciliation: 'آشتی', reflection: 'تأمل', rest: 'استراحت', setback: 'تلاش', intervention: 'دخالت ناظر', living_conditions: 'تجربهٔ شرایط زندگی', response: 'واکنش به رفتار', insult: 'توهین', betrayal: 'خیانت به اعتماد' };

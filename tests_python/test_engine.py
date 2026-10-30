@@ -49,15 +49,16 @@ class EngineTests(unittest.TestCase):
         competitive.traits.impression_management = .95
         competitive.traits.self_control = .9
         competitive.needs.esteem = .1
+        competitive.values.achievement = .95
         event = Event("test-event", 0, "achievement", "پیشرفت یک نفر", "public", subject.id)
         first = appraise(kind, event, subject)
         second = appraise(competitive, event, subject)
-        self.assertGreater(second.envy, first.envy)
-        self.assertGreater(second.joy, 0)
+        self.assertGreater(second.dimensions.comparison, first.dimensions.comparison)
+        self.assertGreater(second.feelings.joy, 0)
         self.assertTrue(second.masked)
         perceive(sim.world, competitive, event)
         self.assertEqual(competitive.public_state.action, "celebrate")
-        self.assertGreater(competitive.emotions.envy, 0)
+        self.assertGreater(competitive.emotions.sadness, 0)
 
     def test_history_changes_interpretation_and_relationships_are_directed(self):
         sim = Simulation(population=2)
@@ -68,7 +69,7 @@ class EngineTests(unittest.TestCase):
         first = appraise(observer, event, subject)
         observer.beliefs.fairness = .05
         second = appraise(observer, event, subject)
-        self.assertGreater(second.suspicion, first.suspicion)
+        self.assertGreater(second.dimensions.suspicion, first.dimensions.suspicion)
         reverse_before = subject.relationships[observer.id].trust
         perceive(sim.world, observer, Event("help", 0, "help", "کمک", "local", subject.id, observer.id))
         self.assertEqual(subject.relationships[observer.id].trust, reverse_before)
@@ -76,13 +77,13 @@ class EngineTests(unittest.TestCase):
     def test_privacy_and_rejected_invitation(self):
         sim = Simulation(population=24)
         sim.step(8)
-        self.assertTrue(all(not event.observers for event in sim.world.events if event.visibility == "private"))
+        self.assertTrue(all(set(event.observers) <= {event.actor_id, event.target_id} for event in sim.world.events if event.visibility == "private"))
         first, second = sim.world.agents[:2]
         event = Event("reject", 8, "rejection", "دعوت رد شد", "local", first.id, second.id)
         self.assertIsNone(perceive(sim.world, second, event))
-        before = first.emotions.anxiety
+        before = first.emotions.fear
         perceive(sim.world, first, event)
-        self.assertGreater(first.emotions.anxiety, before)
+        self.assertGreater(first.emotions.fear, before)
 
     def test_extension_lifecycle_and_deferred_events_after_resume(self):
         def after(context):
@@ -99,7 +100,7 @@ class EngineTests(unittest.TestCase):
         restored.step()
         event = next(e for e in restored.world.events if e.id == event_id)
         self.assertTrue(event.observers)
-        self.assertFalse(restored.world.pending_events)
+        self.assertTrue(all(e.kind == "response" for e in restored.world.pending_events))
         self.assertEqual(restored.world.extensions["counter"], 2)
         with self.assertRaises(ValueError):
             restored.register_system(system)
@@ -145,25 +146,30 @@ class MigrationTests(unittest.TestCase):
         # Optional null fields can be absent in Python's compact representation.
         self.assertEqual(normalize(json.loads(first)), normalize(json.loads(second)))
 
-    def test_identical_worlds_across_languages_and_unicode_seeds(self):
+    def test_legacy_worlds_preserve_identity_traits_and_experiences(self):
         for seed in ("hello-friend", "جامعه🌱"):
             with self.subTest(seed=seed):
-                original = self.reference({"options": {"seed": seed, "population": 24}, "operations": [{"method": "step", "count": 24}]})
-                python = Simulation(seed, 24)
-                python.step(24)
-                self.assert_worlds_equal(original, python.snapshot())
+                text = self.reference({"options": {"seed": seed, "population": 24}, "operations": [{"method": "step", "count": 8}]})
+                old = json.loads(text)["world"]
+                sim = Simulation.from_snapshot(text)
+                self.assertEqual(sim.world.tick, old["tick"])
+                for person, previous in zip(sim.world.agents, old["agents"]):
+                    self.assertEqual(to_wire(person.identity), previous["identity"])
+                    self.assertEqual(to_wire(person.traits), previous["traits"])
+                    self.assertEqual(normalize(to_wire(person.memories)), normalize(previous["memories"]))
+                    self.assertEqual(person.emotions.fear, previous["emotions"]["anxiety"])
+                    self.assertEqual(person.emotions.disgust, 0)
+                self.assertEqual(sim.world.history, [])
+                self.assertEqual(json.loads(sim.snapshot())["version"], 2)
 
-    def test_web_save_continues_in_python_and_python_save_continues_in_web(self):
-        saved = self.reference({"options": {"seed": "old-world", "population": 24}, "operations": [{"method": "step", "count": 8}, {"method": "condition", "key": "socialSafety", "value": .2}]})
-        python = Simulation.from_snapshot(saved)
-        python.announce_achievement("person-3")
-        python.step(8)
-        expected = self.reference({"snapshot": saved, "operations": [{"method": "achievement", "id": "person-3"}, {"method": "step", "count": 8}]})
-        self.assert_worlds_equal(expected, python.snapshot())
-        exported = python.snapshot()
-        python.step(4)
-        continued = self.reference({"snapshot": exported, "operations": [{"method": "step", "count": 4}]})
-        self.assert_worlds_equal(continued, python.snapshot())
+    def test_migrated_world_continues_reproducibly_under_new_rules(self):
+        saved = self.reference({"options": {"seed": "old-world", "population": 24}, "operations": [{"method": "step", "count": 8}]})
+        first = Simulation.from_snapshot(saved)
+        second = Simulation.from_snapshot(first.snapshot())
+        for sim in (first, second):
+            sim.announce_achievement("person-3")
+            sim.step(8)
+        self.assertEqual(first.snapshot(), second.snapshot())
 
 
 class ApplicationTests(unittest.TestCase):
@@ -209,6 +215,27 @@ class ApplicationTests(unittest.TestCase):
         for observer_id in event["observers"]:
             person = next(a for a in result["world"]["agents"] if a["id"] == observer_id)
             self.assertTrue(any(m.get("eventId") == event["id"] for m in person["memories"]))
+
+    def test_encounter_command_exposes_complete_trace(self):
+        result = self.controller.handle("encounter", {"kind": "insult", "actorId": "person-1", "targetId": "person-2"})["state"]
+        person = next(a for a in result["world"]["agents"] if a["id"] == "person-2")
+        memory = next(m for m in person["memories"] if m.get("eventId") == result["experimentId"])
+        self.assertEqual(set(memory["emotionsBefore"]), {"joy", "sadness", "fear", "anger", "disgust"})
+        self.assertGreater(memory["emotionsAfter"]["disgust"], memory["emotionsBefore"]["disgust"])
+        self.assertTrue(memory["reactionReason"])
+
+    @unittest.skipUnless(shutil.which("node"), "Needs a version-1 source")
+    def test_legacy_session_is_backed_up_once_before_upgrade(self):
+        source = MigrationTests().reference({"options": {"population": 3}})
+        session = self.controller.data_dir / "session.json"
+        session.write_text(source)
+        next_controller = ApplicationController(self.controller.data_dir)
+        next_controller.save_session()
+        backups = list(self.controller.data_dir.glob("session-before-model-upgrade-*.json"))
+        self.assertEqual(len(backups), 1)
+        self.assertEqual(backups[0].read_text(), source)
+        ApplicationController(self.controller.data_dir).save_session()
+        self.assertEqual(len(list(self.controller.data_dir.glob("session-before-model-upgrade-*.json"))), 1)
 
     def test_unreadable_session_is_preserved(self):
         path = self.controller.data_dir / "session.json"

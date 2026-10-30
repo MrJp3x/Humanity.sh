@@ -34,14 +34,12 @@ Action = Callable[[ActionContext], ActionResult | None]
 def rest(context: ActionContext) -> ActionResult:
     w, a = context.world, context.agent
     a.needs.energy = clamp(a.needs.energy + .24 * (.5 + w.settings.abundance * .5))
-    a.emotions.anxiety *= .87
     return ActionResult(f"{a.identity.name} زمانی برای استراحت کنار گذاشت.", "rest", "private", "کمی برای خودم وقت می‌گذارم.", .4)
 
 
 def reflect(context: ActionContext) -> ActionResult:
     w, a = context.world, context.agent
     a.needs.energy = clamp(a.needs.energy + .09)
-    a.emotions.anxiety *= .78
     memory = next((m for m in reversed(a.memories) if m.source == "experience"), None)
     a.beliefs.self_worth = clamp(a.beliefs.self_worth + a.traits.openness * .004)
     if memory:
@@ -57,10 +55,7 @@ def create(context: ActionContext) -> ActionResult:
     success = random(w) < .35 + a.traits.openness * .3 + w.settings.abundance * .25
     if success:
         a.needs.esteem = clamp(a.needs.esteem + .21)
-        a.emotions.joy = clamp(a.emotions.joy + .28)
         a.beliefs.self_worth = clamp(a.beliefs.self_worth + .015)
-    else:
-        a.emotions.sadness = clamp(a.emotions.sadness + .13 * a.traits.sensitivity)
     return ActionResult(
         f"{a.identity.name} در پروژهٔ شخصی‌اش پیشرفت کرد." if success else f"{a.identity.name} تلاش کرد؛ این بار به نتیجهٔ دلخواه نرسید.",
         "achievement" if success else "setback", "local", "بالاخره یک قدم جلو رفتم!" if success else "دوباره تلاش می‌کنم.", .8 if success else .35,
@@ -72,13 +67,11 @@ def connect(context: ActionContext) -> ActionResult | None:
     if b is None:
         return None
     relation = relationship(b, a.id)
-    accepted = random(w) < clamp(.28 + b.traits.sociability * .35 + relation.trust * .35 - b.emotions.anxiety * .2, .08, .95)
+    accepted = random(w) < clamp(.28 + b.traits.sociability * .35 + relation.trust * .35 - b.emotions.fear * .2 - b.emotions.disgust * .15, .08, .95)
     a.needs.energy = clamp(a.needs.energy - .035)
     if accepted:
         a.needs.belonging = clamp(a.needs.belonging + .22)
         b.needs.belonging = clamp(b.needs.belonging + .14)
-        a.emotions.joy = clamp(a.emotions.joy + .1)
-        b.emotions.joy = clamp(b.emotions.joy + .07)
     return ActionResult(
         f"{a.identity.name} و {b.identity.name} گفت‌وگویی دوستانه داشتند." if accepted else f"{b.identity.name} دعوت {a.identity.name} به گفت‌وگو را نپذیرفت.",
         "connection" if accepted else "rejection", "local", "از این گفت‌وگو خوشحال شدم." if accepted else "شاید وقت دیگری صحبت کنیم.", .78 if accepted else .4,
@@ -102,9 +95,10 @@ def confront(context: ActionContext) -> ActionResult | None:
         return None
     resolution = random(w) < (a.traits.self_control + b.traits.empathy) * .4
     a.needs.energy = clamp(a.needs.energy - .08)
+    insult = not resolution and a.traits.self_control < .35 and a.emotions.anger > .35
     return ActionResult(
-        f"{a.identity.name} و {b.identity.name} دربارهٔ دلخوری‌شان صحبت کردند." if resolution else f"{a.identity.name} و {b.identity.name} دچار اختلاف شدند.",
-        "reconciliation" if resolution else "conflict", "local", "می‌خواهم حرف همدیگر را بفهمیم." if resolution else "با این رفتار موافق نیستم.", .6 if resolution else .1,
+        f"{a.identity.name} و {b.identity.name} دربارهٔ دلخوری‌شان صحبت کردند." if resolution else f"{a.identity.name} به {b.identity.name} توهین کرد." if insult else f"{a.identity.name} و {b.identity.name} دچار اختلاف شدند.",
+        "reconciliation" if resolution else "insult" if insult else "conflict", "local", "می‌خواهم حرف همدیگر را بفهمیم." if resolution else "با این رفتار موافق نیستم.", .6 if resolution else .1,
     )
 
 

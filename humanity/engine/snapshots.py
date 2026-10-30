@@ -1,4 +1,4 @@
-"""Versioned, validated JSON storage compatible with the original web worlds."""
+"""Version-2 JSON storage, with an explicit one-way migration of version 1."""
 
 import json
 import math
@@ -106,7 +106,7 @@ def _unit_record(record):
 
 
 def validate_world(world: World):
-    if world.schema_version != 1 or len(world.seed) >= 200:
+    if world.schema_version != 2 or len(world.seed) >= 200:
         raise ValueError("Unsupported world schema or seed")
     if not 2 <= len(world.agents) <= 300 or not 0 <= world.rng <= 0xFFFFFFFF or world.tick < 0:
         raise ValueError("Invalid population, random state, or clock")
@@ -139,21 +139,46 @@ def validate_world(world: World):
             raise ValueError("Invalid event actor")
         if event.target_id is not None and event.target_id not in ids:
             raise ValueError("Invalid event target")
+        if event.kind == "living_conditions":
+            if not isinstance(event.change, dict) or any(type(event.change.get(k)) not in (int, float) or not math.isfinite(event.change[k]) or not 0 <= event.change[k] <= 1 for k in ("abundance", "socialSafety", "pressure")):
+                raise ValueError("Invalid living-conditions experience")
+    for metric in world.history:
+        if metric.tick < 0 or metric.connections < 0 or any(not 0 <= getattr(metric, key) <= 1 for key in ("wellbeing", "trust", "gap", "joy", "sadness", "fear", "anger", "disgust")):
+            raise ValueError("Invalid historical metric")
 
 
 def dumps(world: World) -> str:
-    return json.dumps({"format": "humanity.sh", "version": 1, "world": to_wire(world)}, ensure_ascii=False, allow_nan=False, separators=(",", ":"))
+    return json.dumps({"format": "humanity.sh", "version": 2, "world": to_wire(world)}, ensure_ascii=False, allow_nan=False, separators=(",", ":"))
+
+
+def migrate_v1(raw):
+    if raw.get("schemaVersion") != 1:
+        raise ValueError("Unsupported legacy schema")
+    for person in raw.get("agents", []):
+        old = person.get("emotions", {})
+        if any(type(old.get(key)) not in (int, float) or not math.isfinite(old[key]) or not 0 <= old[key] <= 1 for key in ("joy", "sadness", "anxiety", "anger", "envy")):
+            raise ValueError("Invalid legacy emotion")
+        person["emotions"] = {"joy": old["joy"], "sadness": max(old["sadness"], old["envy"] * .5),
+                              "fear": old["anxiety"], "anger": old["anger"], "disgust": 0}
+    raw["schemaVersion"] = 2
+    # The old metric formula and model differ. Never splice their time series
+    # into a new experiment as though they were comparable measurements.
+    raw["history"] = []
+    raw.setdefault("extensions", {})["modelMigration"] = {"from": 1, "to": 2}
+    return raw
 
 
 def loads(text: str) -> World:
     if not isinstance(text, str) or len(text.encode("utf-8")) >= MAX_SNAPSHOT_BYTES:
         raise ValueError("Snapshot is too large")
     data = json.loads(text, parse_constant=lambda value: (_ for _ in ()).throw(ValueError(f"Invalid constant: {value}")))
-    if not isinstance(data, dict) or data.get("format") != "humanity.sh" or data.get("version") != 1:
+    if not isinstance(data, dict) or data.get("format") != "humanity.sh" or type(data.get("version")) is not int or data.get("version") not in (1, 2):
         raise ValueError("Unsupported snapshot format")
     raw_world = data.get("world")
     if not isinstance(raw_world, dict) or raw_world.get("_projection"):
         raise ValueError("A view projection is not a world snapshot")
+    if data["version"] == 1:
+        raw_world = migrate_v1(raw_world)
     world = _decode(World, raw_world)
     validate_world(world)
     return world

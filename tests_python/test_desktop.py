@@ -95,6 +95,15 @@ class QtBridgeTests(unittest.TestCase):
         self.assertEqual(self.request("load")["result"]["state"]["world"]["tick"], 6)
         self.assertEqual(self.worker.thread(), self.thread)
 
+    def test_encounter_uses_python_model_through_bridge(self):
+        result = self.request("encounter", {"kind": "insult", "actorId": "person-1", "targetId": "person-2"})
+        self.assertTrue(result["ok"])
+        state = result["result"]["state"]
+        target = next(a for a in state["world"]["agents"] if a["id"] == "person-2")
+        memory = next(m for m in target["memories"] if m.get("eventId") == state["experimentId"])
+        self.assertGreater(memory["emotionsAfter"]["disgust"], memory["emotionsBefore"]["disgust"])
+        self.assertFalse(state["running"])
+
     def test_clock_is_owned_by_python_and_pause_stops_it(self):
         self.request("speed", {"value": 8})
         self.request("run", {"value": True})

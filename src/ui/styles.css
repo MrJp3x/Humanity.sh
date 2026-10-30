@@ -2091,3 +2091,18 @@ dialog .notice {
     scroll-behavior:auto!important
   }
 }
+/* Desktop model 0.3: keep the five feelings and their causal trace prominent. */
+.society-emotions { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 12px 24px; padding: 14px 18px; border: 1px solid #29353b; border-radius: 12px; background: #121d23; font-size: 12px; }
+.society-emotions b { color: #c9ed8c; margin-inline-start: 5px; }
+.appraisal-trace { padding: 16px; margin: 4px 0 22px; background: #15242a; border: 1px solid #30434b; border-radius: 12px; font-size: 12px; line-height: 1.9; }
+.appraisal-trace p { margin: 10px 0; }
+.trace-fact { color: #c4dbde; }
+.trace-reason { color: #c9ed8c; }
+.trace-deltas { display: grid; gap: 6px; margin: 14px 0; }
+.trace-deltas > span { display: flex; justify-content: space-between; gap: 6px; }
+.trace-deltas small { color: #91a4ad; font-size: 10px; min-width: 60px; text-align: end; }
+.trace-deltas b { font-weight: 400; }
+details summary { cursor: pointer; margin: 12px 0; color: #b7cbcf; font-size: 12px; }
+.encounter-controls { display: grid; gap: 10px; padding-top: 18px; margin-top: 20px; border-top: 1px solid #30434b; }
+.encounter-controls[hidden] { display: none; }
+.reaction-emotions, .memory-feelings { flex-wrap: wrap; gap: 8px 14px; }

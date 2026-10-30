@@ -1,4 +1,5 @@
 import { locations } from '../domain/catalog.js';
+import { maskGap } from '../domain/agent.js';
 import { mood, percent } from './format.js';
 
 export class WorldMap {
@@ -59,7 +60,7 @@ export class WorldMap {
   }
   color(agent) {
     if (this.mode === 'trust') return agent.beliefs.trust > .6 ? '#c9ed8c' : agent.beliefs.trust > .4 ? '#83bbbd' : '#eaa36d';
-    if (this.mode === 'gap') return agent.publicState.warmth - agent.emotions.joy + agent.emotions.envy * .65 > .5 ? '#b89af4' : '#83bbbd';
+    if (this.mode === 'gap') return maskGap(agent) > .3 ? '#b89af4' : '#83bbbd';
     return mood(agent).color;
   }
   draw() {

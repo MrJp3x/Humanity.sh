@@ -7,6 +7,7 @@ File operations always use complete snapshots, never trimmed view projections.
 from pathlib import Path
 from dataclasses import fields, replace
 from time import time_ns
+import json
 
 from .engine.agents import mask_gap, wellbeing
 from .engine.models import World
@@ -44,15 +45,18 @@ class ApplicationController:
         self.generation = 0
         self.experiment_id = None
         self.startup_note = None
-        self.unreadable_session = False
+        self.session_backup_reason = None
         session = self.data_dir / "session.json"
         if session.exists() and not fresh:
             try:
                 self.simulation = self.read_world(session)
                 self.startup_note = "جهان از آخرین نشست باز شد."
+                if json.loads(session.read_text(encoding="utf-8")).get("version") == 1:
+                    self.startup_note = "جهان قبلی به مدل پنج احساس منتقل شد؛ ادامهٔ زندگی با قواعد تازه است."
+                    self.session_backup_reason = "before-model-upgrade"
             except (OSError, ValueError, TypeError):
                 self.simulation = self.new_simulation()
-                self.unreadable_session = True
+                self.session_backup_reason = "unreadable"
                 self.startup_note = "ذخیرهٔ نشست قابل بازکردن نبود؛ فایل قبلی حفظ شده است."
         else:
             self.simulation = self.new_simulation()
@@ -117,6 +121,10 @@ class ApplicationController:
             event = self.simulation.announce_achievement(args.get("id"))
             self.running = False
             self.experiment_id = event.id
+        elif method == "encounter":
+            event = self.simulation.encounter(args.get("kind"), args.get("actorId"), args.get("targetId"))
+            self.running = False
+            self.experiment_id = event.id
         elif method == "snapshot":
             return {"snapshot": self.simulation.snapshot()}
         elif method == "import":
@@ -143,7 +151,7 @@ class ApplicationController:
     def save_session(self):
         self.running = False
         session = self.data_dir / "session.json"
-        if self.unreadable_session and session.exists():
-            session.replace(self.data_dir / f"session-unreadable-{time_ns()}.json")
-            self.unreadable_session = False
+        if self.session_backup_reason and session.exists():
+            session.replace(self.data_dir / f"session-{self.session_backup_reason}-{time_ns()}.json")
+            self.session_backup_reason = None
         atomic_write(session, self.simulation.snapshot())

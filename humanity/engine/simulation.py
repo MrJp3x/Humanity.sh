@@ -67,6 +67,7 @@ class Simulation:
             raise ValueError("Invalid world condition")
         before = getattr(self.world.settings, key)
         setattr(self.world.settings, key, value)
+        self.world.extensions["conditionsChanged"] = True
         wire_key = "socialSafety" if key == "social_safety" else key
         emit(self.world, kind="intervention", visibility="private", text="شرایط جهان به دست ناظر تغییر کرد.", change={"key": wire_key, "before": before, "after": value})
 
@@ -75,15 +76,44 @@ class Simulation:
         if agent is None:
             raise ValueError("Agent not found")
         agent.needs.esteem = clamp(agent.needs.esteem + .15)
-        agent.emotions.joy = clamp(agent.emotions.joy + .2)
         for observer in self.world.agents:
             observer.last_reaction_tick = -1
+            observer.extensions.pop("emotionModel", None)
         event = emit(self.world, kind="achievement", visibility="public", actor_id=agent_id,
                      location_id=agent.location_id, text=f"خبر پیشرفت {agent.identity.name} در جمع منتشر شد.", origin="observer")
         queued = self.world.pending_events
         self.world.pending_events = [event]
         observe_events(self.world)
-        self.world.pending_events = [item for item in queued if item.id != event.id]
+        self.world.pending_events = [item for item in queued if item.id != event.id] + self.world.pending_events
+        return event
+
+    def encounter(self, kind: str, actor_id: str, target_id: str):
+        """Controlled two-person scenario using the same appraisal as normal life."""
+        if not isinstance(kind, str) or kind not in ("help", "rejection", "insult", "betrayal"):
+            raise ValueError("Unknown encounter")
+        actor, target = self.world.person(actor_id), self.world.person(target_id)
+        if actor is None or target is None or actor.id == target.id:
+            raise ValueError("دو فرد متفاوت را برای این برخورد انتخاب کن.")
+        descriptions = {
+            "help": f"{actor.identity.name} برای کمک به {target.identity.name} وقت گذاشت.",
+            "rejection": f"{target.identity.name} دعوت {actor.identity.name} به گفت‌وگو را نپذیرفت.",
+            "insult": f"{actor.identity.name} به {target.identity.name} توهین کرد.",
+            "betrayal": f"{actor.identity.name} اعتماد {target.identity.name} را با دروغی آشکار شکست.",
+        }
+        if kind == "help":
+            actor.needs.energy = clamp(actor.needs.energy - .1)
+            actor.needs.esteem = clamp(actor.needs.esteem + .08)
+            target.needs.safety = clamp(target.needs.safety + .16)
+            target.needs.belonging = clamp(target.needs.belonging + .14)
+        for observer in self.world.agents:
+            observer.last_reaction_tick = -1
+            observer.extensions.pop("emotionModel", None)
+        event = emit(self.world, kind=kind, actor_id=actor_id, target_id=target_id,
+                     location_id=actor.location_id, visibility="local", text=descriptions[kind], origin="observer")
+        queued = self.world.pending_events
+        self.world.pending_events = [event]
+        observe_events(self.world)
+        self.world.pending_events = [item for item in queued if item.id != event.id] + self.world.pending_events
         return event
 
     def snapshot(self) -> str:
