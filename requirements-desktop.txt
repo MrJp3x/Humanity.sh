@@ -1,0 +1,3 @@
+# Version verified on macOS for the 0.2 desktop migration.
+# The project extra also permits other supported Qt 6 releases.
+PySide6==6.12.0

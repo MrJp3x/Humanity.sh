@@ -4,74 +4,122 @@
 
 **A world of becoming.**
 
-An extensible society simulation of individual minds, shared experiences, and evolving relationships.
+A Python society simulation with a PySide6 desktop window and an HTML observatory.
 
 [فارسی](docs/README.fa.md) · [Architecture](docs/architecture.md) · [Model assumptions](docs/model.md) · [Contributing](CONTRIBUTING.md)
 
 </div>
 
-Humanity.sh is an early social simulation with an observer's control panel. Every person starts with an identity, formative memories, personality traits, values, beliefs, needs, and emotions. People make decisions, experience outcomes, interpret what they observe, and develop relationships and beliefs over time.
+Each person has an identity, personality, values, beliefs, emotions, needs, memories, and directed relationships. People make decisions, interpret events differently, and change through experience. An observer can inspect individual lives and alter the conditions of their world.
 
-The same news can mean something different to each observer. Someone can feel both happiness and envy while offering a warm public congratulations. Their interpretation is stored separately from the event itself and can influence later decisions.
+## Desktop quick start
 
-## Run locally
-
-Requires **Node.js 22 or newer**. There are no runtime or development package dependencies to install.
+Requires **Python 3.11 or newer**. Node.js is not needed to run the desktop application.
 
 ```sh
 git clone git@github.com:MrJp3x/Humanity.sh.git
 cd Humanity.sh
-npm run dev
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install -e ".[desktop]"
+python -m humanity.desktop
 ```
 
-Open **http://127.0.0.1:4173**. The interface is in Persian and supports right-to-left layout and narrow screens.
+On Windows, activate with `.venv\Scripts\activate` instead. On macOS, after setup you can double-click `Humanity.command`. The interface is in Persian. HTML, JavaScript, fonts, and the Python engine run locally; no ChatGPT sign-in, network service, or AI API key is needed after installation.
+
+Version 0.2 was verified with PySide6 6.12.0. `requirements-desktop.txt` pins that tested top-level version; the desktop extra permits supported Qt 6 releases.
 
 ```sh
-npm run check   # Syntax, module imports, required assets
-npm test        # Simulation invariants and behavioral scenarios
-npm run build  # Static production output in dist/
-node scripts/serve.mjs --dist
+python -m humanity.desktop --fresh                    # Ignore the previous session
+python -m humanity.desktop --data-dir ./my-worlds      # Choose a save directory
 ```
 
-Any static host can serve `dist/`; no server-side runtime, API key, account, or external AI service is needed to run a world. The `.sh` in the project name is branding, not a shell-script implementation.
+## Understand and extend the Python engine
 
-## First version
+Start with these files:
 
-- A 2D society map, relationships, mood colors, and individual selection.
-- 24, 48, 120, or 240 residents from the interface; 2–300 through the engine API.
-- Separate identity, personality, values, beliefs, needs, emotions, and public behavior.
-- Directed relationships: A's trust in B is independent of B's trust in A.
+| File | Responsibility |
+| --- | --- |
+| `humanity/engine/models.py` | Dataclasses for people, personality, emotions, relationships, and worlds |
+| `humanity/engine/decision.py` | Explicit factors used to choose an action |
+| `humanity/engine/perception.py` | Personal interpretations, internal feelings, and outward expression |
+| `humanity/engine/actions.py` | Observable actions and their consequences |
+| `humanity/engine/systems.py` | Needs, development, metrics, and the ordered system contract |
+| `humanity/engine/simulation.py` | Clock, interventions, modules, and the public engine API |
+| `humanity/application.py` | Application commands, persistence, and read-only interface projections |
+| `humanity/desktop/` | PySide6 shell, Python worker, local assets, and WebChannel bridge |
+
+The Python engine has **no Qt dependency**. Run experiments without opening a window:
+
+```sh
+python -m humanity.cli --seed hello-friend --population 48 --steps 240 --save world.json
+python -m humanity.cli --load world.json --steps 24
+```
+
+```python
+from humanity import Simulation
+
+simulation = Simulation(seed="hello-friend", population=48)
+simulation.step(24)
+simulation.set_condition("pressure", 0.6)
+simulation.announce_achievement("person-3")
+
+person = simulation.world.agents[0]
+print(person.identity.name, person.emotions.envy)
+restored = Simulation.from_snapshot(simulation.snapshot())
+```
+
+The engine owns all state changes. HTML/CSS/JavaScript render the map and inspectors and send commands through Qt WebChannel. A single worker thread owns the Python world and clock. The frontend cannot run a second desktop simulation. See [the architecture and extension example](docs/architecture.md).
+
+## Observatory features
+
+- A 2D society map, mood colors, relationships, and searchable residents.
+- 24, 48, 120, or 240 people from the interface; 2–300 through the engine API.
+- Separate personal history, beliefs, feelings, and public behavior.
+- Directed trust: A's trust in B is independent of B's trust in A.
 - Rest, conversation, help, creative work, reflection, and conflict resolution.
-- Agent-specific appraisals of observed events, including simultaneous joy and envy.
-- A decision inspector showing the actual utility factors used by the engine.
-- Personal memories and a public event feed, with private actions excluded from observation.
-- Pause, hourly steps, speed controls, and adjustable environmental conditions.
-- A controlled experiment: publish an individual's achievement and compare observers' interpretations and outward responses.
-- Manual browser saves plus validated JSON import/export, including the random generator's state.
+- Actual decision factors and individual memories linked to observed events.
+- A controlled experiment: announce an achievement and compare observers' joy, envy, interpretation, and outward response.
+- Pause, hourly steps, speed settings, and environmental interventions.
+- Native JSON import/export plus separate manual saves and automatic session recovery.
 
-New worlds begin after **six genuinely simulated hours** so there are already decisions and experiences to inspect. A step represents one hour. Worlds pause when the page is hidden and do not run after it closes. Saves are manual; unsaved progress is lost on reload. The engine retains 400 recent events, 240 metric samples, and at most 82 memories per person, preserving the initial formative memory.
+New worlds begin after six actually simulated hours so there is already experience to inspect. A step represents an hour. The engine retains 400 recent events, 240 metric samples, and at most 82 memories per person, preserving the initial formative memory.
 
-## Extending the world
+Desktop time continues while the window is in the background. Closing the application saves the session and stops the process. Reopening restores that session **paused**. Manual Save/Load uses a separate checkpoint for comparing futures. Files are stored in Qt's application-data directory unless `--data-dir` is supplied. Saves use atomic file replacement. An unreadable session is preserved as a backup rather than silently discarded.
 
-The engine is independent of the browser. Its ordered system lifecycle is:
+### Existing web saves
 
-```text
-before → act → observe → after
-needs    decisions / actions    subjective perception    development / metrics
+The version-1 JSON world format and random generator were preserved. Export a world from the browser and open it in the desktop app. Python exports can also continue in the original browser engine. Cross-language tests verify the same worlds and continuation paths, including Unicode seeds. Browser-local storage is not automatically accessible from the desktop app; export/import is the transfer mechanism.
+
+## Tests and packaging
+
+```sh
+python -m unittest discover -s tests_python -v
 ```
 
-Systems receive a context with world state, seeded randomness, event emission, and action dispatch. A module can keep its own serializable state in `world.extensions` or `agent.extensions`, register actions, and participate in a phase without changing the interface or the clock. See [the extension example](docs/architecture.md#adding-a-system).
+The engine tests use the standard library. Qt integration tests require the desktop extra. Migration tests use Node.js 22+ as an oracle against the original implementation; Node is a **test dependency**, not a desktop runtime dependency.
 
-There is deliberately no country, politics, or elaborate economic hierarchy in this version. Those are future modeling choices, rather than assumptions embedded in the core data model. Financial exchange is not implemented in v0.1.
+```sh
+python -m pip wheel . --no-deps --wheel-dir /tmp/humanity-wheels
+```
 
-## Scope and interpretation
+The wheel includes the HTML interface and its assets. This is a Python desktop application, not yet a signed `.app`, `.dmg`, or Windows installer. Native installer automation is a separate future packaging step.
 
-This is an **exploratory, rule-based model**, not a reconstruction of a real human or a validated predictor of society. Numeric weights are explicit design assumptions. Personality labels and synthetic backgrounds do not establish scientific causal relationships. Memory truncation is a storage bound, not a psychological theory of forgetting.
+## Original standalone web demo
 
-Changing a rule can change an outcome. Use multiple seeds and explicit interventions when exploring a hypothesis. The current interface supports manually restoring a saved world to try another future; it does not yet automate batch experiments or statistical comparisons.
+The existing browser implementation remains as a compatibility adapter and migration reference. It runs its own JavaScript engine without Python. It is separate from the desktop backend and should not be mistaken for a remote Python session.
 
-## License
+```sh
+npm run dev      # http://127.0.0.1:4173
+npm run check
+npm test
+npm run build    # Static browser demo in dist/
+```
 
-Code: [MIT](LICENSE), copyright © 2026 Pedram Asgari.
+The shared frontend selects the Qt bridge inside the desktop application and the browser adapter outside it. A missing desktop bridge produces a visible error rather than silently switching to JavaScript.
 
-Bundled [Vazirmatn](https://github.com/rastikerdar/vazirmatn) font: [SIL Open Font License 1.1](public/fonts/OFL.txt). Font licensing is independent of the code license.
+## Scope and license
+
+This is an exploratory, rule-based model, not a validated predictor of people or societies. Numeric weights and synthetic backgrounds are explicit assumptions. Country systems, financial exchange, family structure, and general-purpose AI reasoning are not implemented yet. See [model assumptions](docs/model.md).
+
+Code: [MIT](LICENSE), copyright © 2026 Pedram Asgari. The bundled [Vazirmatn](https://github.com/rastikerdar/vazirmatn) font uses [OFL 1.1](public/fonts/OFL.txt). Qt/PySide dependencies retain their own licenses.

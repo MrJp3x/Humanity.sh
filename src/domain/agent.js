@@ -38,9 +38,11 @@ export function remember(agent, entry, world) {
   return memory;
 }
 export function wellbeing(agent) {
+  if (agent._view) return agent._view.wellbeing;
   const n = agent.needs;
   return clamp((n.energy + n.belonging + n.safety + n.esteem) / 4 + agent.emotions.joy * .12 - agent.emotions.anxiety * .12 - agent.emotions.sadness * .1);
 }
 export function maskGap(agent) {
+  if (agent._view) return agent._view.maskGap;
   return clamp(agent.publicState.warmth - (agent.emotions.joy - agent.emotions.envy * .65 - agent.emotions.anger * .6));
 }

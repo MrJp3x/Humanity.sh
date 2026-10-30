@@ -1,4 +1,6 @@
-# Model assumptions, version 0.1
+# Model assumptions, version 0.2
+
+Version 0.2 moves the desktop engine to Python while preserving the version-1 model rules and world snapshots. The standalone browser adapter remains a compatibility reference. Application persistence and threading changed; the modeled psychology and its limitations did not.
 
 This document describes implementation choices. These weights are not empirically estimated psychological parameters.
 

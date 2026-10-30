@@ -12,7 +12,7 @@ const server=http.createServer(async(req,res)=>{
   try{
     const pathname=decodeURIComponent(new URL(req.url,'http://localhost').pathname);
     const relative=pathname==='/'?'index.html':pathname.replace(/^\/+/, '');
-    const allowed=['index.html','src/','public/','version.json'].some(prefix=>relative===prefix||prefix.endsWith('/')&&relative.startsWith(prefix));
+    const allowed=['index.html','src/','public/','version.json','humanity/data/catalog.json'].some(prefix=>relative===prefix||prefix.endsWith('/')&&relative.startsWith(prefix));
     if(!allowed||relative.split('/').some(p=>p.startsWith('.')||p==='..')){res.writeHead(404);res.end('Not found');return;}
     const target=path.resolve(root,relative);
     if(!target.startsWith(root+path.sep)){res.writeHead(403);res.end('Forbidden');return;}

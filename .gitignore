@@ -8,3 +8,10 @@ coverage/
 *.log
 *.tar.gz
 .openai/.local/
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+build/
+desktop-artifacts/

@@ -1,79 +1,86 @@
-# Architecture
+# Architecture, version 0.2
 
-## Boundaries
+## Runtime boundaries
 
 ```text
-src/core/       clock, ordered lifecycle, seeded randomness, events, snapshots
-src/domain/     person creation, directed relationships, shared vocabulary
-src/systems/    needs, utility decisions, action outcomes, perception, development
-src/ui/         DOM rendering, map drawing, formatting; no simulation randomness
-src/main.js     application controls, browser persistence, view composition
+humanity/engine/       Python dataclasses, seeded randomness, decisions, perception,
+                      actions, ordered systems, events, and snapshot validation
+humanity/application.py
+                      Serialized commands, complete saves, read-only projections
+humanity/desktop/     PySide6 window, WebChannel bridge, worker, and static assets
+humanity/data/        One shared JSON catalog for creation-time data and labels
+src/ui/               HTML rendering, canvas drawing, formatting, and styles
+src/main.js           View composition and user commands; no simulation clock
+src/services/         Qt client and separate standalone browser adapter
+src/core/, systems/   Original JavaScript engine, retained for the browser demo
 ```
 
-The engine can run in Node without a DOM. The UI calls the public engine API and reads world state. Rendering never consumes the engine's random stream. No framework, server state, or LLM provider is coupled to domain behavior.
+The engine never imports Qt. It uses readable dataclasses and snake_case names; the serializer preserves the established camelCase JSON format. The desktop can run from a source checkout or a wheel containing the interface assets. Node.js is not a desktop runtime dependency.
 
-## State ownership
+## State ownership and threading
 
-`Simulation` owns a plain serializable `world`. People have stable string IDs. Directed relationship records are stored on the observer, keyed by the other person's ID. `agent.initialTraits` preserves creation-time personality while `agent.traits` can evolve.
+A single `SimulationWorker` QObject is moved to a QThread. Its controller, simulation, and single-shot QTimer are constructed in that thread. Commands are queued into it with Qt signals. A timer advances a tick and schedules the next tick after the result has been produced, so slow worlds do not build an unbounded backlog of timer requests. Speed choices express a target delay, not a guaranteed processing rate.
 
-External events record facts and their witnesses. A witness's appraisal becomes a personal memory referencing the event ID. An event is not a globally broadcast belief. Private actions are not delivered to bystanders; local events reach participants and at most four nearby observers. The controlled public achievement experiment reaches at most twelve sampled observers in addition to participants.
+The GUI thread owns the window, WebChannel bridge, and native file dialogs. No background worker accesses a widget. A worker thread avoids blocking the Qt UI event loop; it is not a claim of CPU-parallel Python execution. If larger worlds require multiple CPU cores, the GUI-independent engine can later run in a separate process.
 
-The public presentation of a person (`publicState`) is separate from their emotions. `lastDecision` is the latest independent utility choice; a later social reaction may change outward presentation without replacing that decision.
+Frontend code sends commands and receives JSON projections. It does not own a desktop timer or mutate simulation state. Missing Qt transport in desktop mode produces an explicit error; it never silently starts the browser engine. The original standalone browser uses its own compatibility adapter, which is clearly separate from the Python runtime.
 
-## Public engine API
+## Events and individual interpretation
 
-```js
-import { Simulation } from '../src/core/simulation.js';
+Events record external facts. Individual appraisals become memories linked by event ID. Private events are excluded from witnesses; local events reach participants and at most four nearby observers. The controlled public achievement announcement reaches up to twelve sampled bystanders plus participants.
 
-const simulation = new Simulation({ seed: 'hello-friend', population: 48 });
-simulation.step();                       // One simulated hour
-simulation.step(24);
-simulation.setCondition('pressure', .6);
-simulation.announceAchievement('person-3');
+Directed relationships belong to the observer. Internal emotions and public presentation are separate. The last independent utility decision can differ from a subsequent outward social reaction.
 
-const saved = simulation.snapshot();
-const restored = Simulation.fromSnapshot(saved);
+## Adding a Python system
+
+A system has a unique identifier, phase, order, and synchronous update function. Phases run in this order:
+
+```text
+before → act → observe → after
 ```
 
-`setCondition` validates inputs and records the intervention. `announceAchievement` is an explicit observer intervention, marked `origin: 'observer'`, and is appraised immediately even while time is paused. It does not advance the clock. Users' intervention sequence is part of an experiment's input.
+```python
+from humanity import Simulation
+from humanity.engine.systems import System
 
-## Adding a system
 
-Systems have a unique `id`, a `phase` (`before`, `act`, `observe`, `after`), numeric `order`, and synchronous `update(context)`. Within a phase, order is numeric then identifier. Duplicate IDs and invalid contracts are rejected.
+def update_shared_project(context):
+    state = context.world.extensions.setdefault("shared_project", {"progress": 0})
+    state["progress"] += context.random() * 0.01
 
-```js
-const sharedProject = {
-  id: 'shared-project',
-  phase: 'after',
-  order: 20,
-  update({ world, random, emit, act }) {
-    const state = world.extensions.sharedProject ??= { progress: 0 };
-    state.progress += random() * .01;
-    // Keep this module's data inside its namespace.
-    // Emit factual events when a milestone is actually reached.
-  },
-};
 
-const simulation = new Simulation({ systems: [sharedProject] });
-const restored = Simulation.fromSnapshot(simulation.snapshot(), {
-  systems: [sharedProject],
-});
+project = System("shared-project", "after", update_shared_project, order=20)
+simulation = Simulation(systems=[project])
+simulation.step(24)
+restored = Simulation.from_snapshot(simulation.snapshot(), systems=[project])
 ```
 
-`emit(event)` queues an event for the observation phase; events emitted after that phase are observed on the next step. Default action utilities live in `systems/decision.js`. Register an action through `actions: [[id, handler]]`; a custom `act` system can dispatch it via `act(agent, decision)`. Adding an option to the default utility policy currently requires a focused change to that policy. A policy-provider interface can be extracted when multiple modules need it; this version avoids an unused generalized framework.
+Within a phase, systems sort by numeric order then ID. Use `context.random()`, `context.emit(**event_fields)`, and `context.act(agent, decision)`. Store serializable module data in `world.extensions` or `agent.extensions`; arbitrary namespace keys are preserved by serialization. Events emitted after observation remain queued until the next tick, including after save/restore.
 
-Action handlers return `{ kind, text, visibility, publicText, warmth }` and receive `{ world, agent, target, decision }`. The shared dispatcher records the action outcome and memory. All stochastic simulation logic must use context randomness or the core random helpers, never `Math.random()` or real time. UI animation may use browser time because it cannot alter simulation state.
+Actions are registered through `actions={"action-id": handler}`. A handler receives `ActionContext` and returns `ActionResult`. Default utility choices are in `engine/decision.py`; adding a new default option currently requires a focused edit there. A generalized policy registry can be extracted when multiple features actually need it.
 
-## Snapshots and compatibility
+## Transport, projections, and files
 
-A snapshot contains a format marker, schema version, complete world state, random state, bounded histories, pending events, next IDs, and required system IDs. Restore validates the structure and ranges before constructing a replacement simulation. A snapshot that requires missing modules is rejected. Browser import leaves the current simulation intact on failure.
+Qt WebChannel exposes one narrow request slot and response/update signals. The bridge validates method names. Save/Load uses fixed application-data paths. Export/Open invokes native file choosers on the GUI thread; arbitrary JavaScript-supplied filesystem paths are not accepted.
 
-Version 1 has no migration layer because only one schema exists. When data contracts change incompatibly, add an explicit migration keyed by version and preserve fixtures for old snapshots. Module state should likewise carry a module version when it becomes persistent across releases.
+A read-only loopback server on a random local port serves only interface assets. It has no HTTP simulation API. Python source, Git metadata, saves, hidden files, and paths outside the asset root are not served. Main-frame navigation is restricted to the application origin. The Qt-supplied WebChannel library is injected at document creation.
 
-## Scaling
+View projections include Python-computed metrics and complete memories for the selected person. Other people's memory lists are trimmed to recent context and the current experiment to reduce transport cost. Total memory counts remain accurate. Selecting another person requests a fresh projection. Projections never replace engine state and are explicitly rejected as snapshots.
 
-The initial implementation targets dozens to a few hundred people. Candidate partners are sampled from known contacts; event witnesses are bounded. Some arrays are scanned per person, making parts of a tick quadratic in population. Recent history and memories are bounded. The interface offers up to 240 people; the API validates a ceiling of 300. This is not an architecture for unbounded populations. Measure before introducing indexes, a worker, or a database; the DOM-independent engine can move to a worker without changing the domain model.
+Complete saves use version-1 world JSON and the original random stream. They are written to a temporary sibling file, flushed, and atomically replaced. A manual checkpoint (`world.json`) is independent of the automatic closing session (`session.json`). Resume starts paused. An unreadable session is renamed to a recoverable backup before a replacement is written. User-selected JSON files provide web/desktop transfer; browser localStorage is not shared with Qt.
+
+## Compatibility and scaling
+
+Both engines use the same catalog and 32-bit Mulberry32 generator, including the original UTF-16 seed-hashing behavior. Cross-language tests compare complete worlds after deterministic runs and test continuation in both directions. Optional null fields may be omitted in Python's compact JSON; their meaning is unchanged. Incompatible future schemas need explicit migrations, not silent reinterpretation.
+
+The API ceiling remains 300 people and the interface offers up to 240. Some selection and relationship scans are quadratic; this is a bounded prototype rather than an unlimited-population engine. Histories and memories are bounded. Profile before adding indexes, multiprocessing, or a database.
 
 ## Validation
 
-Node tests cover deterministic replay, restoring the random stream, divergent appraisals, internal/public divergence, history-sensitive interpretation, directed relationships, privacy, bounded states at 240 people, extension lifecycles, and invalid inputs. Browser verification covers the rendered controls and narrow/desktop layouts. CI repeats syntax/import checks, engine tests, and the static build.
+- Python engine, persistence, projection, and extension tests use `unittest`.
+- Migration tests invoke the original Node engine as an independent behavioral reference.
+- Qt signal integration tests exercise the actual bridge, worker-owned timer, native chooser routing, and file saves without desktop automation.
+- Asset-server tests check MIME types and that code/Git files are inaccessible.
+- Existing Node behavioral tests and the static build keep the standalone browser compatible.
+
+The Python engine has no AI-provider dependency. Personality labels and model weights remain exploratory assumptions; the migration does not claim a more realistic psychology simply because the engine language changed.

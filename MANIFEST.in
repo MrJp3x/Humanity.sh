@@ -1,0 +1,4 @@
+include index.html LICENSE README.md
+recursive-include src *.js *.css
+recursive-include public *.svg *.woff2 *.txt
+recursive-include humanity/data *.json
